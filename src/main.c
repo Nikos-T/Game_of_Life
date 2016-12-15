@@ -50,7 +50,7 @@ int main (int argc, char *argv[]) {
   int node_key = name_to_color(pname);
   MPI_Comm my_world;  //inside-processor communicator
   MPI_Comm_split(MPI_COMM_WORLD, node_key, 0, &my_world);
-  int node_nthreads, threadID; //TID is thread ID
+  int node_nthreads, threadID;
   MPI_Comm_size(my_world, &node_nthreads);
   omp_set_num_threads(node_nthreads); //set threads per node
   MPI_Comm_rank(my_world, &threadID);
@@ -59,21 +59,20 @@ int main (int argc, char *argv[]) {
   MPI_Comm_rank(MPI_COMM_WORLD, &TID);  //TID is task ID from MPI_COMM_WORLD
   MPI_Comm_size(MPI_COMM_WORLD, &world_size); //don't need
   
-  //debug
-  printf("Hello from %i of %i\n", TID, world_size);
-  
   MPI_Comm_split(MPI_COMM_WORLD, threadID, TID, &my_world);  //here my_world is outside-processor communicator
   int nNodes, nodeID;
   MPI_Comm_size(my_world, &nNodes);
-  MPI_Comm_rank(my_world, &nodeID);  //TID is node ID
+  MPI_Comm_rank(my_world, &nodeID);
   
   if (threadID!=0) {
     MPI_Finalize();
     return(0);
   }
+  //debug
+  printf("Hello from %i of %i\n", TID, world_size);
   
   //debug
-  printf("Hello from node %i of %i", nodeID, nNodes);
+  printf("Hello from node %i of %i\n", nodeID, nNodes);
   
   
   /*temporary

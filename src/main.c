@@ -104,7 +104,7 @@ int main (int argc, char *argv[]) {
   printf("Board initialized\n");
   generate_table (board, N, thres);
   printf("Board generated\n");
-  temporary*/
+  
   /* play game of life 100 times */
   
   for (i=0; i<t; i++) {

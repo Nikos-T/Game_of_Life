@@ -46,6 +46,7 @@ int main (int argc, char *argv[]) {
   
   //Create one Comm per node and delete all but one MPI-process per node
   char *pname = malloc(MPI_MAX_PROCESSOR_NAME*sizeof(char));  //Maybe I should declare it first
+  int len;
   MPI_Get_processor_name(pname, &len);
   int node_key = name_to_color(pname);
   MPI_Comm node_world;
@@ -53,7 +54,7 @@ int main (int argc, char *argv[]) {
   int node_nthreads, TID;
   MPI_Comm_size(node_world, &node_nthreads);
   MPI_Comm_rank(node_world, &TID);
-  if (thread_ID!=0) {
+  if (TID!=0) {
     MPI_Finalize();
     return(0);
   }

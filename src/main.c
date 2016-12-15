@@ -68,7 +68,7 @@ int main (int argc, char *argv[]) {
   MPI_Comm_split(MPI_COMM_WORLD, 0, TID, &my_world);  //here my_world is outside-processor communicator
   int nNodes;
   MPI_Comm_size(my_world, &nNodes);
-  MPI_Comm_rand(my_world, &TID);  //TID is node ID
+  MPI_Comm_rank(my_world, &TID);  //TID is node ID
   
   //debug
   printf("Hello from node %i of %i", TID, nNodes);

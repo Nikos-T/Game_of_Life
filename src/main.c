@@ -74,28 +74,26 @@ int main (int argc, char *argv[]) {
   //debug
   printf("Hello from node %i of %i\n", nodeID, nNodes);
   
-  
-  /*temporary
   // Input command line arguments
   int N = atoi(argv[1]);        // Horizontal size
   double thres = atof(argv[2]); // Propability of life cell
   int t = atoi(argv[3]);        // Number of generations 
   int disp = atoi(argv[4]);     // Display output?
-  printf("Size %dx%d with propability: %0.1f%%\n", M, N, thres*100);
+  printf("Size %dx%d with propability: %0.1f%%\n", N, N, thres*100);
 
   board = NULL;
   newboard = NULL;
   
-  board = (int *)malloc(part*part*sizeof(int));
+  board = (int *)malloc(N*N*sizeof(int));
 
   if (board == NULL){
     printf("\nERROR: Memory allocation did not complete successfully!\n");
     return (1);
   }
-  temporary*/
+  
   /* second pointer for updated result */
-  /*temporary
-  newboard = (int *)malloc(part*part*sizeof(int));
+  
+  newboard = (int *)malloc(N*N*sizeof(int));
 
   if (newboard == NULL){
     printf("\nERROR: Memory allocation did not complete successfully!\n");
@@ -108,13 +106,13 @@ int main (int argc, char *argv[]) {
   printf("Board generated\n");
   temporary*/
   /* play game of life 100 times */
-  /*temporary
+  
   for (i=0; i<t; i++) {
     if (disp) display_table (board, N);
     play (board, newboard, N);    
   }
   printf("Game finished after %d generations.\n", t);
-  temporary*/
+  
   MPI_Finalize();
   return(0);
 }

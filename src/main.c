@@ -34,7 +34,7 @@ int main (int argc, char *argv[]) {
      "  M     : size of table (M x N)\n"
 	   "  N     : size of table (M x N)\n"
 	   "  thres : propability of alive cell\n"
-           "  t     : number of generations\n"
+     "  t     : number of generations\n"
 	   "  disp  : {1: display output, 0: hide output}\n"
            , argv[0]);
     return (1);

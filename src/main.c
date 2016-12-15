@@ -44,7 +44,7 @@ int main (int argc, char *argv[]) {
   int provided;
   MPI_Init_thread( &argc, &argv, MPI_THREAD_MULTIPLE, &provided);
   
-  //Create one Comm per node and delete all but one MPI-process per node
+  //Create one Comm per node and delete all but one MPI-process per node. Also set the omp threads.
   char *pname = malloc(MPI_MAX_PROCESSOR_NAME*sizeof(char));  //Maybe I should declare it first
   int len;
   MPI_Get_processor_name(pname, &len);
@@ -53,6 +53,7 @@ int main (int argc, char *argv[]) {
   MPI_Comm_split(MPI_COMM_WORLD, node_key, 0, &node_world);
   int node_nthreads, TID;
   MPI_Comm_size(node_world, &node_nthreads);
+  omp_set_num_threads(node_nthreads); //threads per node
   MPI_Comm_rank(node_world, &TID);
   if (TID!=0) {
     MPI_Finalize();

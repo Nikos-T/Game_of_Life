@@ -17,6 +17,17 @@
 
 MPI_Comm my_world;  //inside-processor communicator
 int nodeID, nNodes;
+MPI_Status status;
+
+/*https://www.archer.ac.uk/training/course-material/2015/10/AdvMPI_EPCC/S1-L04-Split-Comms.pdf*/
+int name_to_color(char *processor_name) {
+  int hash=0, i=0;
+  while((unsigned char)processor_name[i]!=0) {
+    hash+=(unsigned char)processor_name[i];
+    i++;
+  }
+  return hash;
+}
 
 int my_MPI_Initialize() {
   // MPI init
@@ -51,15 +62,81 @@ int my_MPI_Initialize() {
     return(1);
   }
   return(0);
-  //debug
-  printf("Hello from %i of %i\n", TID, world_size);
   
-  //debug
-  printf("Hello from node %i of %i\n", nodeID, nNodes);
+}
+
+unsigned char encode( int * cells) {
+  unsigned char coded8 = (cells[7]<<7) | (cells[6]<<6) | (cells[5]<<5) | (cells[4]<<4) | (cells[3]<<3) | (cells[2]<<2) | (cells[1]<<1) | cells[0];
+  return coded8;
+}
+
+void decode( unsigned char coded8, int * cells) {
+  #pragma omp parallel for
+  for (int i=0; i<8; i++) {
+    cells[i] = coded8 & 0x01;
+    coded8 = coded8>>1;
+  }
+}
+
+void transfer_board(int *board, int N, int *wholeboard, int *boundaries) {
+  if (nNodes == 2) {
+    unsigned char coded_board1[N*N/8];
+    if (nodeID == 0) {
+      MPI_Recv(coded_board1, N*N/8, MPI_UNSIGNED_CHAR, 1, 1, my_world);
+      //decode:
+      #pragma omp parallel for
+      for (int i=0; i<N*N/8; i++) {
+        decode(&coded_board1[i], &board[N*N+i*8]);
+      }
+    } else {
+      //encode:
+      #pragma omp parallel for
+      for (int i=0; i<N*N/8; i++) {
+        coded_board1 = encode(&board[i*8]);
+      }
+      MPI_Send(coded_board1, N*N/8, MPI_UNSIGNED_CHAR, 0, 1, my_world);
+    }
+  } else if (nNodes ==4) {
+    unsigned char coded_columns[3*N*N/8];
+    if (nodeID == 0) {
+      #pragma omp parallel for nowait
+      for (int i=0; i<N; i++) {
+        memcpy(&wholeboard[2*N*i], &board[N*i], N*sizeof(int)); //copy board0 to wholeboard
+      }
+      //receive
+      #pragma omp parallel sections
+      {
+        #pragma omp section
+        {
+          #pragma omp parallel for
+          for (int i=0; i<N; i++) {
+            MPI_Recv(&coded_columns[(N+i)*N/8], N, MPI_UNSIGNED_CHAR, 1, i, my_world);
+          }
+        }
+        #pragma omp section
+        {
+          #pragma omp parallel for
+        }
+        #pragma omp section
+        {
+          
+        }
+      }
+      //decode
+    } else {
+      #pragma omp parallel for
+      for (int i=0; i<N
+      
+    }
+    
+}
+
+void transfer_boundaries(int *board, int N, int *boundaries) {
+  
 }
 
 int main (int argc, char *argv[]) {
-  int   *board, *newboard, i;
+  int   *board, *newboard, *wholeboard, i;
 
   if (argc != 5) { // Check if the command line arguments are correct 
     printf( "Usage: %s N thres disp\n"
@@ -72,8 +149,16 @@ int main (int argc, char *argv[]) {
     return (1);
   }
   
+  /*Initialize MPI*/
+  int r = my_MPI_Initialize();
+  if (r==1)
+    return (0);
+  else if (r==-1)
+    return (-1);
+  
   // Input command line arguments
   int N = atoi(argv[1]);        // Array size
+  N+=8-N%8;                     //for encode-decode
   double thres = atof(argv[2]); // Propability of life cell
   int t = atoi(argv[3]);        // Number of generations 
   int disp = atoi(argv[4]);     // Display output?
@@ -81,9 +166,23 @@ int main (int argc, char *argv[]) {
 
   board = NULL;
   newboard = NULL;
-  
-  board = (int *)malloc(N*N*sizeof(int));
 
+  board = (int *)malloc(N*N*sizeof(int));
+  if (nodeID == 0) {
+    if (nNodes==2) {
+      board = (int *) realloc(2*N*N*sizeof(int));
+    } else if (nNodes==4) {
+      wholeboard = (int *)malloc(4*N*N*sizeof(int));
+    }
+  }
+  
+  int * boundaries;
+  if (nNodes == 2) {
+    boundaries = (int *)malloc(2*N*sizeof(int));
+  } else if (nNodes == 4) {
+    boundaries = (int *)malloc(4*N*sizeof(int));
+  }
+  
   if (board == NULL){
     printf("\nERROR: Memory allocation did not complete successfully!\n");
     return (1);
@@ -101,12 +200,41 @@ int main (int argc, char *argv[]) {
   printf("Board initialized\n");
   generate_table (board, N, thres);
   printf("Board generated\n");
-
+  
+  
   /* play game of life 100 times */
 
+  if (nNodes ==1) {
+    for (i=0; i<t; i++) {
+      if (disp) display_table (board, N);
+      play (board, newboard, N, boundaries);    
+    }
+    printf("Game finished after %d generations.\n", t);
+    MPI_Finalize();
+    return(0);
+  }
+  
   for (i=0; i<t; i++) {
-    if (disp) display_table (board, N);
-    play (board, newboard, N);    
+    if (disp && nodeID==0) {
+      //pass whole table
+      transfer_board(board, N, wholeboard, boundaries);
+      display_table(wholeboard, 2*N);
+    } else {
+      //pass only boundaries
+      transfer_boundaries(board, N, boundaries);
+    }
+    play (board, newboard, N, boundaries, nNodes);    
   }
   printf("Game finished after %d generations.\n", t);
+  //last transfer and print
+  transfer_board(board, N, wholeboard, boundaries);
+  if (disp && nodeID==0) display_table(wholeboard, 2*N);
+  
+  free(boundaries);
+  free(board);
+  free(newboard);
+  free(wholeboard);
+  
+  MPI_Finalize();
+  return(0);
 }

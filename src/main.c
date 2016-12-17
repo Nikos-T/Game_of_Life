@@ -18,6 +18,7 @@
 MPI_Comm my_world;  //inside-processor communicator
 int nodeID, nNodes;
 MPI_Status status;
+bool no_realloc=TRUE;
 
 /*https://www.archer.ac.uk/training/course-material/2015/10/AdvMPI_EPCC/S1-L04-Split-Comms.pdf*/
 int name_to_color(char *processor_name) {
@@ -82,6 +83,10 @@ void transfer_board(int *board, int N, int *wholeboard, int *boundaries) {
   if (nNodes == 2) {
     unsigned char coded_board1[N*N/8];
     if (nodeID == 0) {
+      if (no_realloc) {
+        board = realloc(board, 2*N*N*sizeof(int));
+        alloc = FALSE;
+      }
       MPI_Recv(coded_board1, N*N/8, MPI_UNSIGNED_CHAR, 1, 1, my_world);
       //decode:
       #pragma omp parallel for

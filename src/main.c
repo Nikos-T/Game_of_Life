@@ -12,7 +12,8 @@
 
 #include <game-of-life.h>
 
-#include <stdbool.h>
+#include <string.h>   //memcpy
+#include <stdbool.h>  //bool
 #include <mpi.h>
 #include <omp.h>
 
@@ -55,9 +56,10 @@ void transfer_board(int *board, int N, int *wholeboard, int *boundaries) {
     if (nodeID == 0) {
       if (no_realloc) {
         board = realloc(board, 2*N*N*sizeof(int));
+        //wholeboard=board;
         no_realloc = false;
       }
-      MPI_Recv(coded_board1, N*N/8, MPI_UNSIGNED_CHAR, 1, 1, my_world);
+      MPI_Recv(coded_board1, N*N/8, MPI_UNSIGNED_CHAR, 1, 1, my_world, status);
       //decode:
       #pragma omp parallel for
       for (int i=0; i<N*N/8; i++) {
@@ -67,14 +69,14 @@ void transfer_board(int *board, int N, int *wholeboard, int *boundaries) {
       //encode:
       #pragma omp parallel for
       for (int i=0; i<N*N/8; i++) {
-        coded_board1 = encode(&board[i*8]);
+        coded_board1[i] = encode(&board[i*8]);
       }
       MPI_Send(coded_board1, N*N/8, MPI_UNSIGNED_CHAR, 0, 1, my_world);
     }
   } else if (nNodes ==4) {
     if (nodeID == 0) {
       unsigned char coded_columns[3*N*N/8];
-      #pragma omp parallel for nowait
+      #pragma omp parallel for
       for (int i=0; i<N; i++) {
         memcpy(&wholeboard[2*N*i], &board[N*i], N*sizeof(int)); //copy board0 to wholeboard
       }
@@ -84,19 +86,19 @@ void transfer_board(int *board, int N, int *wholeboard, int *boundaries) {
         #pragma omp section
         {
           for (int i=0; i<N; i++) {
-            MPI_Recv(&coded_columns[(N+i)*N/4], N/8, MPI_UNSIGNED_CHAR, 1, i, my_world, status);    //2*N^2/8+2*i*N/8
+            MPI_Recv(&coded_columns[(N+i)*N/4], N/8, MPI_UNSIGNED_CHAR, 1, i, my_world, &status);    //2*N^2/8+2*i*N/8
           }
         }
         #pragma omp section
         {
           for (int i=0; i<N; i++) {
-            MPI_Recv(&coded_columns[(2*i+1)*N/8], N/8, MPI_UNSIGNED_CHAR, 2, i, my_world, status);
+            MPI_Recv(&coded_columns[(2*i+1)*N/8], N/8, MPI_UNSIGNED_CHAR, 2, i, my_world, &status);
           }
         }
         #pragma omp section
         {
           for (int i=0; i<N; i++) {
-            MPI_Recv(&coded_columns[(4*i+3)*N/4], N, MPI_UNSIGNED_CHAR, 3, i, my_world, status);    //2*N^2/8+(2*i+1)*N/8
+            MPI_Recv(&coded_columns[(4*i+3)*N/4], N, MPI_UNSIGNED_CHAR, 3, i, my_world, &status);    //2*N^2/8+(2*i+1)*N/8
           }
         }
       }
@@ -110,7 +112,7 @@ void transfer_board(int *board, int N, int *wholeboard, int *boundaries) {
       //encode:
       #pragma omp parallel for
       for (int i=0; i<N*N/8; i++) {
-        coded_columns[i] = encode(&board(8*i));
+        coded_columns[i] = encode(&board[8*i]);
       }
       //Send
       for (int i=0; i<N; i++) {

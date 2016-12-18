@@ -102,38 +102,51 @@ void transfer_board(int *board, int N, int *wholeboard, int *boundaries) {
       MPI_Send(coded_board1, N*N/8, MPI_UNSIGNED_CHAR, 0, 1, my_world);
     }
   } else if (nNodes ==4) {
-    unsigned char coded_columns[3*N*N/8];
     if (nodeID == 0) {
+      unsigned char coded_columns[3*N*N/8];
       #pragma omp parallel for nowait
       for (int i=0; i<N; i++) {
         memcpy(&wholeboard[2*N*i], &board[N*i], N*sizeof(int)); //copy board0 to wholeboard
       }
-      //receive
+      //receive:
       #pragma omp parallel sections
       {
         #pragma omp section
         {
-          #pragma omp parallel for
           for (int i=0; i<N; i++) {
-            MPI_Recv(&coded_columns[(N+i)*N/8], N, MPI_UNSIGNED_CHAR, 1, i, my_world);
+            MPI_Recv(&coded_columns[(N+i)*N/4], N/8, MPI_UNSIGNED_CHAR, 1, i, my_world, status);    //2*N^2/8+2*i*N/8
           }
         }
         #pragma omp section
         {
-          #pragma omp parallel for
+          for (int i=0; i<N; i++) {
+            MPI_Recv(&coded_columns[(2*i+1)*N/8], N/8, MPI_UNSIGNED_CHAR, 2, i, my_world, status);
+          }
         }
         #pragma omp section
         {
-          
+          for (int i=0; i<N; i++) {
+            MPI_Recv(&coded_columns[(4*i+3)*N/4], N, MPI_UNSIGNED_CHAR, 3, i, my_world, status);    //2*N^2/8+(2*i+1)*N/8
+          }
         }
       }
-      //decode
-    } else {
+      //decode:
       #pragma omp parallel for
-      for (int i=0; i<N
-      
+      for (int i=0; i<3*N*N/8; i++) {
+        decode(coded_columns[i], &wholeboard[N*N+8*i]);
+      }
+    } else {
+      unsigned char coded_columns[N*N/8];
+      //encode:
+      #pragma omp parallel for
+      for (int i=0; i<N*N/8; i++) {
+        coded_columns[i] = encode(&board(8*i));
+      }
+      //Send
+      for (int i=0; i<N; i++) {
+        MPI_Send(&coded_columns[i*N/8], N/8, MPI_UNSIGNED_CHAR, 0, i, my_world);
+      }
     }
-    
 }
 
 void transfer_boundaries(int *board, int N, int *boundaries) {
@@ -203,12 +216,17 @@ int main (int argc, char *argv[]) {
 
   initialize_board (board, N);
   printf("Board initialized\n");
-  generate_table (board, N, thres);
+  /*debug
+  generate_table (board, N, thres); */
+  #pragma omp parallel for
+  for (int i=0; i<N*N; i++) {
+    board[i]=i%2;
+  }
   printf("Board generated\n");
   
   
   /* play game of life 100 times */
-
+  /*debug
   if (nNodes ==1) {
     for (i=0; i<t; i++) {
       if (disp) display_table (board, N);
@@ -233,7 +251,11 @@ int main (int argc, char *argv[]) {
   printf("Game finished after %d generations.\n", t);
   //last transfer and print
   transfer_board(board, N, wholeboard, boundaries);
-  if (disp && nodeID==0) display_table(wholeboard, 2*N);
+  if (disp && nodeID==0) display_table(wholeboard, 2*N); */
+  transfer_board(board, N, wholeboard, boundaries);
+  if (disp && nodeID==0) {
+    display_table(wholeboard, 2*N);
+  }
   
   free(boundaries);
   free(board);

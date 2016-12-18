@@ -30,39 +30,8 @@ int name_to_color(char *processor_name) {
   return hash;
 }
 
-int my_MPI_Initialize() {
-  // MPI init
-  int provided;
-  MPI_Init_thread( &argc, &argv, MPI_THREAD_MULTIPLE, &provided);
+int my_MPI_Initialize(int *argc, char **argv []) {
   
-  //Create one Comm per node and delete all but one MPI-process per node. Also set the omp threads.
-  char *pname = malloc(MPI_MAX_PROCESSOR_NAME*sizeof(char));  //Maybe I should declare it first
-  int len;
-  MPI_Get_processor_name(pname, &len);
-  int node_key = name_to_color(pname);
-  
-  MPI_Comm_split(MPI_COMM_WORLD, node_key, 0, &my_world); //here my_world is inside-processor communicator
-  int node_nthreads, threadID;
-  MPI_Comm_size(my_world, &node_nthreads);
-  omp_set_num_threads(node_nthreads); //set threads per node
-  MPI_Comm_rank(my_world, &threadID);
-  
-  int  TID;
-  MPI_Comm_rank(MPI_COMM_WORLD, &TID);  //TID is task ID from MPI_COMM_WORLD
-  
-  MPI_Comm_split(MPI_COMM_WORLD, threadID, TID, &my_world);  //here my_world is outside-processor communicator
-  MPI_Comm_size(my_world, &nNodes);
-  MPI_Comm_rank(my_world, &nodeID);
-  if (nNodes!=1 && nNodes!=2 && nNodes!=4) {
-    printf("This many nodes not supported");
-    MPI_Finalize();
-    return(-1);
-  }
-  if (threadID!=0) {
-    MPI_Finalize();
-    return(1);
-  }
-  return(0);
   
 }
 
@@ -168,11 +137,37 @@ int main (int argc, char *argv[]) {
   }
   
   /*Initialize MPI*/
-  int r = my_MPI_Initialize();
-  if (r==1)
-    return (0);
-  else if (r==-1)
-    return (-1);
+  // MPI init
+  int provided;
+  MPI_Init_thread( &argc, &argv, MPI_THREAD_MULTIPLE, &provided);
+  
+  //Create one Comm per node and delete all but one MPI-process per node. Also set the omp threads.
+  char *pname = malloc(MPI_MAX_PROCESSOR_NAME*sizeof(char));  //Maybe I should declare it first
+  int len;
+  MPI_Get_processor_name(pname, &len);
+  int node_key = name_to_color(pname);
+  
+  MPI_Comm_split(MPI_COMM_WORLD, node_key, 0, &my_world); //here my_world is inside-processor communicator
+  int node_nthreads, threadID;
+  MPI_Comm_size(my_world, &node_nthreads);
+  omp_set_num_threads(node_nthreads); //set threads per node
+  MPI_Comm_rank(my_world, &threadID);
+  
+  int  TID;
+  MPI_Comm_rank(MPI_COMM_WORLD, &TID);  //TID is task ID from MPI_COMM_WORLD
+  
+  MPI_Comm_split(MPI_COMM_WORLD, threadID, TID, &my_world);  //here my_world is outside-processor communicator
+  MPI_Comm_size(my_world, &nNodes);
+  MPI_Comm_rank(my_world, &nodeID);
+  if (nNodes!=1 && nNodes!=2 && nNodes!=4) {
+    printf("This many nodes not supported");
+    MPI_Finalize();
+    return(-1);
+  }
+  if (threadID!=0) {
+    MPI_Finalize();
+    return(1);
+  }
   
   // Input command line arguments
   int N = atoi(argv[1]);        // Array size

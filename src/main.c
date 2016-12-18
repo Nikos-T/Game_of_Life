@@ -76,19 +76,19 @@ void transfer_board(int *board, int N, int *wholeboard, int *boundaries) {
         #pragma omp section
         {
           for (int i=0; i<N; i++) {
-            MPI_Recv(&coded_columns[(N+2*i)*N/8], N/8, MPI_UNSIGNED_CHAR, 1, i, MPI_COMM_WORLD, &status);    //2*N^2/8+2*i*N/8
+            MPI_Recv(&coded_columns[(N+2*i)*N/8], N/8, MPI_UNSIGNED_CHAR, 1, i, my_world, &status);    //2*N^2/8+2*i*N/8
           }
         }
         #pragma omp section
         {
           for (int i=0; i<N; i++) {
-            MPI_Recv(&coded_columns[i*N/8], N/8, MPI_UNSIGNED_CHAR, 2, i, MPI_COMM_WORLD, &status);
+            MPI_Recv(&coded_columns[i*N/8], N/8, MPI_UNSIGNED_CHAR, 2, i, my_world, &status);
           }
         }
         #pragma omp section
         {
           for (int i=0; i<N; i++) {
-            MPI_Recv(&coded_columns[(N+2*i+1)*N/8], N/8, MPI_UNSIGNED_CHAR, 3, i, MPI_COMM_WORLD, &status);    //2*N^2/8+(2*i+1)*N/8
+            MPI_Recv(&coded_columns[(N+2*i+1)*N/8], N/8, MPI_UNSIGNED_CHAR, 3, i, my_world, &status);    //2*N^2/8+(2*i+1)*N/8
           }
         }
       }
@@ -168,6 +168,8 @@ int main (int argc, char *argv[]) {
     MPI_Finalize();
     return(0);
   }
+  
+  
   
   // Input command line arguments
   int N = atoi(argv[1]);        // Array size

@@ -76,25 +76,31 @@ void transfer_board(int *board, int N, int *wholeboard, int *boundaries) {
         #pragma omp section
         {
           for (int i=0; i<N; i++) {
-            MPI_Recv(&coded_columns[(N+i)*N/4], N/8, MPI_UNSIGNED_CHAR, 1, i, my_world, &status);    //2*N^2/8+2*i*N/8
+            MPI_Recv(&coded_columns[(N+2*i)*N/8], N/8, MPI_UNSIGNED_CHAR, 1, i, MPI_COMM_WORLD, &status);    //2*N^2/8+2*i*N/8
           }
         }
         #pragma omp section
         {
           for (int i=0; i<N; i++) {
-            MPI_Recv(&coded_columns[(2*i+1)*N/8], N/8, MPI_UNSIGNED_CHAR, 2, i, my_world, &status);
+            MPI_Recv(&coded_columns[i*N/8], N/8, MPI_UNSIGNED_CHAR, 2, i, MPI_COMM_WORLD, &status);
           }
         }
         #pragma omp section
         {
           for (int i=0; i<N; i++) {
-            MPI_Recv(&coded_columns[(4*i+3)*N/4], N, MPI_UNSIGNED_CHAR, 3, i, my_world, &status);    //2*N^2/8+(2*i+1)*N/8
+            MPI_Recv(&coded_columns[(N+2*i+1)*N/8], N/8, MPI_UNSIGNED_CHAR, 3, i, MPI_COMM_WORLD, &status);    //2*N^2/8+(2*i+1)*N/8
           }
         }
       }
       //decode:
       #pragma omp parallel for
-      for (int i=0; i<3*N*N/8; i++) {
+      for (int i=0; i<N; i++) {
+        for (int j=0; j<N/8; j++) {
+          decode(coded_columns[i*N/8+j], &wholeboard[(2*i+1)*N+8*j]);
+        }
+      }
+      #pragma omp parallel for
+      for (int i=N*N/8; i<3*N*N/8; i++) {
         decode(coded_columns[i], &wholeboard[N*N+8*i]);
       }
     } else {
@@ -206,14 +212,9 @@ int main (int argc, char *argv[]) {
 
   initialize_board (board, N);
   printf("Board initialized\n");
-  /*debug
-  generate_table (board, N, thres); */
-  #pragma omp parallel for
-  for (int i=0; i<N*N; i++) {
-    board[i]=i%2;
-  }
+  generate_table (board, N, thres);
   printf("Board generated\n");
-  
+  display_table(board, N);
   
   /* play game of life 100 times */
   /*debug

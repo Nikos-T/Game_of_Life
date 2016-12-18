@@ -248,7 +248,7 @@ int main (int argc, char *argv[]) {
   if (disp && nodeID==0) display_table(wholeboard, 2*N); */
   transfer_board(board, N, wholeboard, boundaries);
   if (disp && nodeID==0 && nNodes>1) {
-    display_table(wholeBoard, 2*N);
+    display_table(wholeboard, 2*N);
   }
   
   if (nNodes>1) free(boundaries);

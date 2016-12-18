@@ -165,6 +165,7 @@ int main (int argc, char *argv[]) {
     return(-1);
   }
   if (threadID!=0) {
+    printf("closed");
     MPI_Finalize();
     return(0);
   }
@@ -246,14 +247,14 @@ int main (int argc, char *argv[]) {
   transfer_board(board, N, wholeboard, boundaries);
   if (disp && nodeID==0) display_table(wholeboard, 2*N); */
   transfer_board(board, N, wholeboard, boundaries);
-  if (disp && nodeID==0) {
-    display_table(wholeboard, 2*N);
+  if (disp && nodeID==0 && nNodes>1) {
+    display_table(wholeBoard, 2*N);
   }
   
-  free(boundaries);
+  if (nNodes>1) free(boundaries);
   free(board);
   free(newboard);
-  free(wholeboard);
+  if (nodeID==0 && nNodes>1) free(wholeboard);
   
   MPI_Finalize();
   return (0);

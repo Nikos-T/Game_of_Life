@@ -1,7 +1,7 @@
 VER = 1.0
 
 CC     = mpicc
-CFLAGS = -O3 -Wall -fopenmp
+CFLAGS = -O3 -Wall -fopenmp -std=c99
 RM     = rm -rf
 TAR    = tar -czvf
 

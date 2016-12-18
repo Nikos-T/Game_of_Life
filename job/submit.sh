@@ -1,5 +1,5 @@
 #!/bin/bash
-#PBS -N hello_MPI
+#PBS -N game-of-life
 #PBS -q pdlab
 #PBS -j oe
 #PBS -l nodes=4:ppn=5

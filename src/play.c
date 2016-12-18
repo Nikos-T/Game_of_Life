@@ -39,9 +39,5 @@ void play (int *board, int *newboard, int N, int *boundaries) {
       for (j=0; j<N; j++) {
         Board(i,j) = NewBoard(i,j);
       }
-  } else if (nNodes == 2){
-    
-  } else {  //nNodes==4
-    
   }
 }

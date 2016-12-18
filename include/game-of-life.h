@@ -22,7 +22,7 @@ int adjacent_to (int *board, int i, int j, int N);
 
 /* play the game through one generation */
 
-void play (int *board, int *newboard, int N, int *boundaries, int nNodes);
+void play (int *board, int *newboard, int N, int *boundaries);
 
 /* print the life board */
 

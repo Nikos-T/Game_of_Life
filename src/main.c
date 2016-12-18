@@ -32,11 +32,6 @@ int name_to_color(char *processor_name) {
   return hash;
 }
 
-int my_MPI_Initialize(int *argc, char **argv []) {
-  
-  
-}
-
 unsigned char encode( int * cells) {
   unsigned char coded8 = (cells[7]<<7) | (cells[6]<<6) | (cells[5]<<5) | (cells[4]<<4) | (cells[3]<<3) | (cells[2]<<2) | (cells[1]<<1) | cells[0];
   return coded8;
@@ -54,11 +49,11 @@ void transfer_board(int *board, int N, int *wholeboard, int *boundaries) {
   if (nNodes == 2) {
     unsigned char coded_board1[N*N/8];
     if (nodeID == 0) {
-      MPI_Recv(coded_board1, N*N/8, MPI_UNSIGNED_CHAR, 1, 1, my_world, status);
+      MPI_Recv(coded_board1, N*N/8, MPI_UNSIGNED_CHAR, 1, 1, my_world, &status);
       //decode:
       #pragma omp parallel for
       for (int i=0; i<N*N/8; i++) {
-        decode(&coded_board1[i], &board[N*N+i*8]);
+        decode(coded_board1[i], &board[N*N+i*8]);
       }
     } else {
       //encode:
@@ -114,11 +109,12 @@ void transfer_board(int *board, int N, int *wholeboard, int *boundaries) {
         MPI_Send(&coded_columns[i*N/8], N/8, MPI_UNSIGNED_CHAR, 0, i, my_world);
       }
     }
+  }
 }
 
-void transfer_boundaries(int *board, int N, int *boundaries) {
+//void transfer_boundaries(int *board, int N, int *boundaries) {
   
-}
+//}
 
 int main (int argc, char *argv[]) {
   int   *board, *newboard, *wholeboard, i;
@@ -257,5 +253,5 @@ int main (int argc, char *argv[]) {
   free(wholeboard);
   
   MPI_Finalize();
-  return(0);
+  return (0);
 }

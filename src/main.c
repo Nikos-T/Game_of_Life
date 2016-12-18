@@ -54,11 +54,6 @@ void transfer_board(int *board, int N, int *wholeboard, int *boundaries) {
   if (nNodes == 2) {
     unsigned char coded_board1[N*N/8];
     if (nodeID == 0) {
-      if (no_realloc) {
-        board = realloc(board, 2*N*N*sizeof(int));
-        //wholeboard=board;
-        no_realloc = false;
-      }
       MPI_Recv(coded_board1, N*N/8, MPI_UNSIGNED_CHAR, 1, 1, my_world, status);
       //decode:
       #pragma omp parallel for
@@ -186,7 +181,8 @@ int main (int argc, char *argv[]) {
   board = (int *)malloc(N*N*sizeof(int));
   if (nodeID == 0) {
     if (nNodes==2) {
-      board = (int *) realloc(2*N*N*sizeof(int));
+      board = (int *) realloc(board, 2*N*N*sizeof(int));
+      wholeboard = board;
     } else if (nNodes==4) {
       wholeboard = (int *)malloc(4*N*N*sizeof(int));
     }

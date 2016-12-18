@@ -12,13 +12,14 @@
 
 #include <game-of-life.h>
 
+#include <stdbool.h>
 #include <mpi.h>
 #include <omp.h>
 
 MPI_Comm my_world;  //inside-processor communicator
 int nodeID, nNodes;
 MPI_Status status;
-boolean no_realloc = TRUE;
+bool no_realloc = TRUE;
 
 /*https://www.archer.ac.uk/training/course-material/2015/10/AdvMPI_EPCC/S1-L04-Split-Comms.pdf*/
 int name_to_color(char *processor_name) {
@@ -166,7 +167,7 @@ int main (int argc, char *argv[]) {
   }
   if (threadID!=0) {
     MPI_Finalize();
-    return(1);
+    return(0);
   }
   
   // Input command line arguments

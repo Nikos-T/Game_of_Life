@@ -139,7 +139,7 @@ int main (int argc, char *argv[]) {
   /*Initialize MPI*/
   // MPI init
   int provided;
-  MPI_Init_thread( &argc, &argv, MPI_THREAD_MULTIPLE, &provided);
+  MPI_Init_thread( &argc, &argv, MPI_THREAD_SERIALIZED, &provided);
   
   //Create one Comm per node and delete all but one MPI-process per node. Also set the omp threads.
   char *pname = malloc(MPI_MAX_PROCESSOR_NAME*sizeof(char));  //Maybe I should declare it first

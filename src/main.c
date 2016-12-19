@@ -148,7 +148,11 @@ int main (int argc, char *argv[]) {
   /*Initialize MPI*/
   int provided;
   MPI_Init_thread( &argc, &argv, MPI_THREAD_MULTIPLE, &provided);
-  printf("provided= %i\n", provided);
+  if (provided!=3) {
+    printf("Could not provide MULTIPLE thread calling");
+    MPI_Finalize();
+    return(3);
+  }
 
   //Create one Comm per node and delete all but one MPI-process per node. Also set the omp threads.
   char *pname = malloc(MPI_MAX_PROCESSOR_NAME*sizeof(char));
@@ -203,10 +207,10 @@ int main (int argc, char *argv[]) {
       wholeboard = board;
     } else if (nNodes==4) { //here column size changes so we need the variable wholeboard
       wholeboard = (int *)malloc(4*N*N*sizeof(int));
-    }
-    if ((wholeboard == NULL) && (nNodes >1)) {
-      printf("\nERROR: Memory allocation did not complete successfully!\n");
-      return (1);
+      if ((wholeboard == NULL) && (nNodes >1)) {
+        printf("\nERROR: Memory allocation did not complete successfully!\n");
+        return (1);
+      }
     }
   }
   
@@ -273,7 +277,7 @@ int main (int argc, char *argv[]) {
   if (nNodes>1) free(boundaries);
   free(board);
   free(newboard);
-  if (nodeID==0 && nNodes>1) free(wholeboard);
+  if (nodeID==0 && nNodes==4) free(wholeboard);
   
   MPI_Finalize();
   return (0);

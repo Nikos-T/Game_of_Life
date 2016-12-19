@@ -75,6 +75,7 @@ void transfer_board(int *board, int N, int *wholeboard, int *boundaries) {
       {
         #pragma omp section
         {
+          fprintf("--------1-----------");
           for (int i=0; i<N; i++) {
             MPI_Recv(&coded_columns[(N+2*i)*N/8], N/8, MPI_UNSIGNED_CHAR, 1, i, my_world, &status1);    //2*N^2/8+2*i*N/8
             printf("Received column %i from node1\n", (N+2*i));
@@ -83,16 +84,18 @@ void transfer_board(int *board, int N, int *wholeboard, int *boundaries) {
         }
         #pragma omp section
         {
+          fprintf("--------2-----------");
           for (int i=0; i<N; i++) {
-            MPI_Recv(&coded_columns[i*N/8], N/8, MPI_UNSIGNED_CHAR, 2, i+N, my_world, &status2);
+            MPI_Recv(&coded_columns[i*N/8], N/8, MPI_UNSIGNED_CHAR, 2, i, my_world, &status2);
             printf("Received column %i from node2\n", i*N/8);
           }
           printf("Received all columns from node2\n");
         }
         #pragma omp section
         {
+          fprintf("--------3-----------");
           for (int i=0; i<N; i++) {
-            MPI_Recv(&coded_columns[(N+2*i+1)*N/8], N/8, MPI_UNSIGNED_CHAR, 3, i+2*N, my_world, &status3);    //2*N^2/8+(2*i+1)*N/8
+            MPI_Recv(&coded_columns[(N+2*i+1)*N/8], N/8, MPI_UNSIGNED_CHAR, 3, i, my_world, &status3);    //2*N^2/8+(2*i+1)*N/8
             printf("Received column %i from node3\n", (N+2*i+1));
           }
           printf("Received all columns from node3\n");
@@ -118,7 +121,7 @@ void transfer_board(int *board, int N, int *wholeboard, int *boundaries) {
       }
       //Send
       for (int i=0; i<N; i++) {
-        MPI_Send(&coded_columns[i*N/8], N/8, MPI_UNSIGNED_CHAR, 0, i+(nodeID-1)*N, my_world);
+        MPI_Send(&coded_columns[i*N/8], N/8, MPI_UNSIGNED_CHAR, 0, i, my_world);
       }
       printf("Node%i has sent data\n", nodeID);
     }
@@ -172,7 +175,6 @@ int main (int argc, char *argv[]) {
     return(-1);
   }
   if (threadID!=0) {
-    printf("Killed\n");
     MPI_Finalize();
     return(0);
   }
@@ -223,7 +225,6 @@ int main (int argc, char *argv[]) {
   printf("Board initialized\n");
   generate_table (board, N, thres);
   printf("Board generated\n");
-  display_table(board, N);
   
   /* play game of life 100 times */
   /*debug

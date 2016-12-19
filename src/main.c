@@ -13,14 +13,12 @@
 #include <game-of-life.h>
 
 #include <string.h>   //memcpy
-#include <stdbool.h>  //bool
 #include <mpi.h>
 #include <omp.h>
 
 MPI_Comm my_world;  //inside-processor communicator
 int nodeID, nNodes;
 MPI_Status status, status1, status2, status3;
-bool no_realloc = true;
 
 /*https://www.archer.ac.uk/training/course-material/2015/10/AdvMPI_EPCC/S1-L04-Split-Comms.pdf*/
 int name_to_color(char *processor_name) {
@@ -31,6 +29,7 @@ int name_to_color(char *processor_name) {
   }
   return hash;
 }
+
 
 unsigned char encode( int * cells) {
   unsigned char coded8 = (cells[7]<<7) | (cells[6]<<6) | (cells[5]<<5) | (cells[4]<<4) | (cells[3]<<3) | (cells[2]<<2) | (cells[1]<<1) | cells[0];
@@ -136,26 +135,31 @@ int main (int argc, char *argv[]) {
   int   *board, *newboard, *wholeboard, i=0;
 
   if (argc != 5) { // Check if the command line arguments are correct 
+
     printf( "Usage: %s N thres disp\n"
             "where\n"
             "  N     : size of table (N x N)\n"
             "  thres : propability of alive cell\n"
             "  t     : number of generations\n"
             "  disp  : {1: display output, 0: hide output}\n"
+
            , argv[0]);
     return (1);
   }
   
+
   /*Initialize MPI*/
   // MPI init
   int provided;
   MPI_Init_thread( &argc, &argv, MPI_THREAD_MULTIPLE, &provided);
   printf("provided= %i\n", provided);
+
   //Create one Comm per node and delete all but one MPI-process per node. Also set the omp threads.
   char *pname = malloc(MPI_MAX_PROCESSOR_NAME*sizeof(char));  //Maybe I should declare it first
   int len;
   MPI_Get_processor_name(pname, &len);
   int node_key = name_to_color(pname);
+
   
   MPI_Comm_split(MPI_COMM_WORLD, node_key, 0, &my_world); //here my_world is inside-processor communicator
   int node_nthreads, threadID;
@@ -163,6 +167,7 @@ int main (int argc, char *argv[]) {
   omp_set_num_threads(node_nthreads); //set threads per node
   MPI_Comm_rank(my_world, &threadID);
   
+
   int  TID;
   MPI_Comm_rank(MPI_COMM_WORLD, &TID);  //TID is task ID from MPI_COMM_WORLD
   
@@ -174,15 +179,18 @@ int main (int argc, char *argv[]) {
     MPI_Finalize();
     return(-1);
   }
+
   if (threadID!=0) {
     MPI_Finalize();
     return(0);
   }
+
   
   
   // Input command line arguments
   int N = atoi(argv[1]);        // Array size
   N+=8-N%8;                     //for encode-decode
+
   double thres = atof(argv[2]); // Propability of life cell
   int t = atoi(argv[3]);        // Number of generations 
   int disp = atoi(argv[4]);     // Display output?
@@ -212,8 +220,9 @@ int main (int argc, char *argv[]) {
     printf("\nERROR: Memory allocation did not complete successfully!\n");
     return (1);
   }
-
+  
   /* second pointer for updated result */
+  
   newboard = (int *)malloc(N*N*sizeof(int));
 
   if (newboard == NULL){
@@ -226,30 +235,7 @@ int main (int argc, char *argv[]) {
   generate_table (board, N, thres, nodeID);
   printf("Board generated\n");
   
-  MPI_Barrier(my_world);
-  if (nodeID==0) {
-    printf("=================\n");
-    display_table(board, N);
-    printf("=================\n");
-  }
-  MPI_Barrier(my_world);
-  if (nodeID==1) {
-    printf("=================\n");
-    display_table(board, N);
-    printf("=================\n");
-  }
-  MPI_Barrier(my_world);
-  if (nodeID==2) {
-    printf("=================\n");
-    display_table(board, N);
-    printf("=================\n");
-  }
-  MPI_Barrier(my_world);
-  if (nodeID==3) {
-    printf("=================\n");
-    display_table(board, N);
-    printf("=================\n");
-  }
+
   /* play game of life 100 times */
   /*debug
   if (nNodes ==1) {
@@ -261,6 +247,7 @@ int main (int argc, char *argv[]) {
     MPI_Finalize();
     return(0);
   }
+
   
   for (i=0; i<t; i++) {
     if (disp && nodeID==0) {
@@ -274,6 +261,7 @@ int main (int argc, char *argv[]) {
     play (board, newboard, N, boundaries, nNodes);    
   }
   printf("Game finished after %d generations.\n", t);
+
   //last transfer and print
   transfer_board(board, N, wholeboard, boundaries);
   if (disp && nodeID==0) display_table(wholeboard, 2*N); */
@@ -294,4 +282,5 @@ int main (int argc, char *argv[]) {
   
   MPI_Finalize();
   return (0);
+
 }

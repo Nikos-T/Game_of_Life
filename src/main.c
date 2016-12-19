@@ -120,7 +120,7 @@ void transfer_board(int *board, int N, int *wholeboard, int *boundaries) {
       for (int i=0; i<N; i++) {
         MPI_Send(&coded_columns[i*N/8], N/8, MPI_UNSIGNED_CHAR, 0, i, my_world);
       }
-      printf("Node%i has sent data", nodeID);
+      printf("Node%i has sent data\n", nodeID);
     }
   }
 }
@@ -130,7 +130,7 @@ void transfer_board(int *board, int N, int *wholeboard, int *boundaries) {
 //}
 
 int main (int argc, char *argv[]) {
-  int   *board, *newboard, *wholeboard, i;
+  int   *board, *newboard, *wholeboard, i=0;
 
   if (argc != 5) { // Check if the command line arguments are correct 
     printf( "Usage: %s N thres disp\n"
@@ -172,10 +172,11 @@ int main (int argc, char *argv[]) {
     return(-1);
   }
   if (threadID!=0) {
-    printf("closed");
+    i++;
     MPI_Finalize();
     return(0);
   }
+  printf("closed %i MPI tasks\n", i);
   
   
   
@@ -199,12 +200,7 @@ int main (int argc, char *argv[]) {
       wholeboard = (int *)malloc(4*N*N*sizeof(int));
     }
   }
-  //check
-  #pragma omp parallel for
-  for (int i=0; i<10; i++) {
-    printf("%i", i);
-  }
-  printf("\n");
+  
   int * boundaries;
   if (nNodes == 2) {
     boundaries = (int *)malloc(2*N*sizeof(int));

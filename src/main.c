@@ -112,11 +112,11 @@ void transfer_board(int *board, int N, int *wholeboard, int *boundaries) {
       {
         #pragma omp section
         {
-          uncoded_b[i] = board(i*N);
+          uncoded_b[i] = board[i*N];
         }
         #pragma omp section
         {
-          uncoded_b[N+i] = board(N*(1+i)-1);
+          uncoded_b[N+i] = board[N*(1+i)-1];
         }
       }
     }
@@ -267,11 +267,11 @@ void transfer_boundaries(int *board, int N, int *boundaries) {
       {
         #pragma omp section
         {
-          uncoded[i] = board(i*N);
+          uncoded[i] = board[i*N];
         }
         #pragma omp section
         {
-          uncoded[N+i] = board(N*(1+i)-1);
+          uncoded[N+i] = board[N*(1+i)-1];
         }
       }
     }

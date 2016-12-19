@@ -46,7 +46,27 @@ void decode( unsigned char coded8, int * cells) {
 void transfer_board(int *board, int N, int *wholeboard, int *boundaries) {
   if (nNodes == 2) {
     unsigned char coded_board1[N*N/8];
+    unsigned char coded_b[N/4];
     if (nodeID == 0) {
+      //encode boundaries:
+      #pragma omp parallel for
+      for (int i=0; i<N/8; i++) {
+        #pragma omp parallel sections
+        {
+          #pragma omp section
+          {
+            coded[i] = encode(&board[8*i]);
+          }
+          #pragma omp section
+          {
+            coded[N/8+i] = encode(&board[N*(N-1)+8*i]);
+          }
+        }
+      }
+      //Send boundaries:
+      MPI_Send(coded_b, N/4, MPI_UNSIGNED_CHAR, 1, 0, my_world);
+      
+      //receive board:
       MPI_Recv(coded_board1, N*N/8, MPI_UNSIGNED_CHAR, 1, 1, my_world, &status);
       //decode:
       #pragma omp parallel for
@@ -74,10 +94,63 @@ void transfer_board(int *board, int N, int *wholeboard, int *boundaries) {
         coded_board1[i] = encode(&board[i*8]);
       }
       MPI_Send(coded_board1, N*N/8, MPI_UNSIGNED_CHAR, 0, 1, my_world);
+      
+      //receive boundaries:
+      MPI_Recv(coded_b, N/4, MPI_UNSIGNED_CHAR, 0, 0, my_world, &status);
+      //decode boundaries:
+      #pragma omp parallel for
+      for (int i=0; i<N/4; i++) {
+        decode(coded_b[i], &boundaries[8*i]);
+      }
     }
   } else if (nNodes ==4) {
+    unsigned char coded_b[N/2];
+    int uncoded_b[2*N];
+    #pragma omp parallel for
+    for (int i=0; i<N; i++) {
+      #pragma omp parallel sections
+      {
+        #pragma omp section
+        {
+          uncoded_b[i] = board(i*N);
+        }
+        #pragma omp section
+        {
+          uncoded_b[N+i] = board(N*(1+i)-1);
+        }
+      }
+    }
+    //encode:
+    #pragma omp parallel for
+    for (int i=0; i<N/8; i++) {
+      #pragma omp parallel sections
+      {
+        #pragma omp section
+        {
+          coded_b[i] = encode(&board[8*i]);
+        }
+        #pragma omp section
+        {
+          coded_b[N/8+i] = encode(&board[N*(N-1)+8*i]);
+        }
+        #pragma omp section
+        {
+          coded_b[N/4+i] = encode(&uncoded_b[8*i]);
+        }
+        #pragma omp section
+        {
+          coded_b[3*N/8+i] = encode(&uncoded_b[N+8*i]);
+        }
+      }
+    }
     if (nodeID == 0) {
+      
       unsigned char coded_columns[3*N*N/8];
+      
+      //send boundaries
+      MPI_Send(coded, N/4, MPI_UNSIGNED_CHAR, 1, 0, my_world);
+      MPI_Send(&coded[N/4], N/4, MPI_UNSIGNED_CHAR, 2, 1, my_world);
+      
       #pragma omp parallel for
       for (int i=0; i<N; i++) {
         memcpy(&wholeboard[2*N*i], &board[N*i], N*sizeof(int)); //copy board0 to wholeboard
@@ -145,6 +218,29 @@ void transfer_board(int *board, int N, int *wholeboard, int *boundaries) {
         decode(coded_columns[i], &wholeboard[N*N+8*i]);
       }
     } else {
+      switch (nodeID) {
+        case 1:
+          MPI_Send(&coded_b[N/4], N/4, MPI_UNSIGNED_CHAR, 3, 1, my_world);
+          MPI_Recv(coded_b, N/4, MPI_UNSIGNED_CHAR, 0, 0, my_world, &status);
+          MPI_Recv(&coded_b[N/4], N/4, MPI_UNSIGNED_CHAR, 3, 1, my_world, &status);
+          break;
+        case 2:
+          MPI_Send(coded_b, N/4, MPI_UNSIGNED_CHAR, 3, 0, my_world);
+          MPI_Recv(coded_b, N/4, MPI_UNSIGNED_CHAR, 3, 0, my_world, &status);
+          MPI_Recv(&coded_b[N/4], N/4, MPI_UNSIGNED_CHAR, 0, 1, my_world, &status);
+          break;
+        case 3:
+          MPI_Send(coded_b, N/4, MPI_UNSIGNED_CHAR, 2, 0, my_world);
+          MPI_Send(&coded_b[N/4], N/4, MPI_UNSIGNED_CHAR, 1, 1, my_world);
+          MPI_Recv(coded_b, N/4, MPI_UNSIGNED_CHAR, 2, 0, my_world, &status);
+          MPI_Recv(&coded_b[N/4], N/4, MPI_UNSIGNED_CHAR, 1, 1, my_world, &status);
+          break;
+      }
+      //decode boundaries:
+      #pragma omp parallel for
+      for (int i=0; i<N*nNodes/8; i++) {
+        decode(coded_b[i], &boundaries[8*i]);
+      }
       unsigned char coded_columns[N*N/8];
       //encode:
       #pragma omp parallel for
@@ -171,11 +267,11 @@ void transfer_boundaries(int *board, int N, int *boundaries) {
       {
         #pragma omp section
         {
-          uncoded[i] = i*N;
+          uncoded[i] = board(i*N);
         }
         #pragma omp section
         {
-          uncoded[N+i] = N*(1+i)-1;
+          uncoded[N+i] = board(N*(1+i)-1);
         }
       }
     }

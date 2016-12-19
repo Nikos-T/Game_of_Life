@@ -347,7 +347,7 @@ int main (int argc, char *argv[]) {
   if (nNodes == 1) {
     for (int i=0; i<t; i++) {
       if (disp) display_table(board, N, N);
-      play(board, newboard, boundaries);
+      play(board, newboard, N, boundaries);
     }
   } else {
     for (int i=0; i<t; i++) {
@@ -357,7 +357,7 @@ int main (int argc, char *argv[]) {
       } else {
         transfer_boundaries(board, N, boundaries);
       }
-      play(board, newboard, boundaries);
+      play(board, newboard, N, boundaries);
     }
   }
   

@@ -224,8 +224,19 @@ int main (int argc, char *argv[]) {
   initialize_board (board, N);
 //printf("Board initialized\n");
   generate_table (board, N, thres, nodeID);
-//printf("Board generated\n");
+  printf("Board generated\n");
   
+  if (nodeID==0)
+    display_table(board, N);
+  MPI_Barrier(my_world);
+  if (nodeID==1)
+    display_table(board, N);
+  MPI_Barrier(my_world);
+  if (nodeID==2)
+    display_table(board, N);
+  MPI_Barrier(my_world);
+  if (nodeID==3)
+    display_table(board, N);
   /* play game of life 100 times */
   /*debug
   if (nNodes ==1) {
@@ -257,6 +268,7 @@ int main (int argc, char *argv[]) {
     usleep(100000);
     printf("=====================Board transfer started============================\n");
   }
+  MPI_Barrier(my_world);
   transfer_board(board, N, wholeboard, boundaries);
   if (disp && nodeID==0 && nNodes>1) {
     display_table(wholeboard, 2*N);

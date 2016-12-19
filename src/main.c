@@ -85,7 +85,7 @@ void transfer_board(int *board, int N, int *wholeboard, int *boundaries) {
         {
           for (int i=0; i<N; i++) {
             MPI_Recv(&coded_columns[i*N/8], N/8, MPI_UNSIGNED_CHAR, 2, i, my_world, &status);
-            printf("Received column %i from node1\n", i);
+            printf("Received column %i from node2\n", i);
           }
           printf("Received all columns from node2\n");
         }
@@ -93,7 +93,7 @@ void transfer_board(int *board, int N, int *wholeboard, int *boundaries) {
         {
           for (int i=0; i<N; i++) {
             MPI_Recv(&coded_columns[(N+2*i+1)*N/8], N/8, MPI_UNSIGNED_CHAR, 3, i, my_world, &status);    //2*N^2/8+(2*i+1)*N/8
-            printf("Received column %i from node1\n", (N+2*i+1));
+            printf("Received column %i from node3\n", (N+2*i+1));
           }
           printf("Received all columns from node3\n");
         }

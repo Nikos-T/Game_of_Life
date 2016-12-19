@@ -5,7 +5,7 @@
 
 #include <game-of-life.h>
 
-void play (int *board, int *newboard, int N) {
+void play (int *board, int *newboard, int N, int *boundaries) {
   /*
     (copied this from some web page, hence the English spellings...)
 
@@ -23,21 +23,21 @@ void play (int *board, int *newboard, int N) {
   int   i, j, a;
 
   /* for each cell, apply the rules of Life */
-
-  for (i=0; i<N; i++)
-    for (j=0; j<N; j++) {
-      a = adjacent_to (board, i, j, N);
-      if (a == 2) NewBoard(i,j) = Board(i,j);
-      if (a == 3) NewBoard(i,j) = 1;
-      if (a < 2) NewBoard(i,j) = 0;
-      if (a > 3) NewBoard(i,j) = 0;
-    }
+  if (boundaries == NULL) {
+    for (i=0; i<N; i++)
+      for (j=0; j<N; j++) {
+        a = adjacent_to (board, i, j, N);
+        if (a == 2) NewBoard(i,j) = Board(i,j);
+        if (a == 3) NewBoard(i,j) = 1;
+        if (a < 2) NewBoard(i,j) = 0;
+        if (a > 3) NewBoard(i,j) = 0;
+      }
 
   /* copy the new board back into the old board */
 
-  for (i=0; i<N; i++)
-    for (j=0; j<N; j++) {
-      Board(i,j) = NewBoard(i,j);
-    }
-
+    for (i=0; i<N; i++)
+      for (j=0; j<N; j++) {
+        Board(i,j) = NewBoard(i,j);
+      }
+  }
 }

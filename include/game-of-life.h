@@ -22,7 +22,7 @@ int adjacent_to (int *board, int i, int j, int N);
 
 /* play the game through one generation */
 
-void play (int *board, int *newboard, int N);
+void play (int *board, int *newboard, int N, int *boundaries);
 
 /* print the life board */
 
@@ -30,7 +30,7 @@ void print (int *board, int N);
 
 /* generate random table */
 
-void generate_table (int *board, int N, float threshold);
+void generate_table (int *board, int N, float threshold, int nodeID);
 
 /* display the table with delay and clear console */
 

@@ -30,7 +30,7 @@ void print (int *board, int N);
 
 /* generate random table */
 
-void generate_table (int *board, int N, float threshold);
+void generate_table (int *board, int N, float threshold, int nodeID);
 
 /* display the table with delay and clear console */
 

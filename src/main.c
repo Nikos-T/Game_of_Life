@@ -148,8 +148,8 @@ void transfer_board(int *board, int N, int *wholeboard, int *boundaries) {
       unsigned char coded_columns[3*N*N/8];
       
       //send boundaries
-      MPI_Send(coded, N/4, MPI_UNSIGNED_CHAR, 1, 0, my_world);
-      MPI_Send(&coded[N/4], N/4, MPI_UNSIGNED_CHAR, 2, 1, my_world);
+      MPI_Send(coded_b, N/4, MPI_UNSIGNED_CHAR, 1, 0, my_world);
+      MPI_Send(&coded_b[N/4], N/4, MPI_UNSIGNED_CHAR, 2, 1, my_world);
       
       #pragma omp parallel for
       for (int i=0; i<N; i++) {

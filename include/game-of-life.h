@@ -34,6 +34,6 @@ void generate_table (int *board, int N, float threshold, int nodeID);
 
 /* display the table with delay and clear console */
 
-void display_table(int *board, int N);
+void display_table(int *board, int N, int M);
 
 /* #endif // FOO_H_ */

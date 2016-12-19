@@ -77,18 +77,21 @@ void transfer_board(int *board, int N, int *wholeboard, int *boundaries) {
         {
           for (int i=0; i<N; i++) {
             MPI_Recv(&coded_columns[(N+2*i)*N/8], N/8, MPI_UNSIGNED_CHAR, 1, i, my_world, &status);    //2*N^2/8+2*i*N/8
+            printf("Received column %i from node1", (N+2*i));
           }
         }
         #pragma omp section
         {
           for (int i=0; i<N; i++) {
             MPI_Recv(&coded_columns[i*N/8], N/8, MPI_UNSIGNED_CHAR, 2, i, my_world, &status);
+            printf("Received column %i from node1", i);
           }
         }
         #pragma omp section
         {
           for (int i=0; i<N; i++) {
             MPI_Recv(&coded_columns[(N+2*i+1)*N/8], N/8, MPI_UNSIGNED_CHAR, 3, i, my_world, &status);    //2*N^2/8+(2*i+1)*N/8
+            printf("Received column %i from node1", (N+2*i+1));
           }
         }
       }
@@ -114,6 +117,7 @@ void transfer_board(int *board, int N, int *wholeboard, int *boundaries) {
       for (int i=0; i<N; i++) {
         MPI_Send(&coded_columns[i*N/8], N/8, MPI_UNSIGNED_CHAR, 0, i, my_world);
       }
+      printf("Node%i has sent data", nodeID);
     }
   }
 }
@@ -192,7 +196,12 @@ int main (int argc, char *argv[]) {
       wholeboard = (int *)malloc(4*N*N*sizeof(int));
     }
   }
-  
+  //check
+  #pragma omp parallel for
+  for (int i=0; i<10; i++) {
+    printf("%i", i);
+  }
+  printf("\n");
   int * boundaries;
   if (nNodes == 2) {
     boundaries = (int *)malloc(2*N*sizeof(int));

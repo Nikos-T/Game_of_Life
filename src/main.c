@@ -85,7 +85,7 @@ void transfer_board(int *board, int N, int *wholeboard, int *boundaries) {
         {
           for (int i=0; i<N; i++) {
             MPI_Recv(&coded_columns[i*N/8], N/8, MPI_UNSIGNED_CHAR, 2, i, my_world, &status);
-            printf("Received column %i from node2\n", i);
+            printf("Received column %i from node2\n", i*N/8);
           }
           printf("Received all columns from node2\n");
         }
@@ -146,7 +146,7 @@ int main (int argc, char *argv[]) {
   /*Initialize MPI*/
   // MPI init
   int provided;
-  MPI_Init_thread( &argc, &argv, MPI_THREAD_SERIALIZED, &provided);
+  MPI_Init_thread( &argc, &argv, MPI_THREAD_FUNNELED, &provided);
   
   //Create one Comm per node and delete all but one MPI-process per node. Also set the omp threads.
   char *pname = malloc(MPI_MAX_PROCESSOR_NAME*sizeof(char));  //Maybe I should declare it first
@@ -172,12 +172,10 @@ int main (int argc, char *argv[]) {
     return(-1);
   }
   if (threadID!=0) {
-    i++;
+    printf("Killed\n");
     MPI_Finalize();
     return(0);
   }
-  printf("closed %i MPI tasks\n", i);
-  
   
   
   // Input command line arguments

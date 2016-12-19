@@ -149,8 +149,8 @@ int main (int argc, char *argv[]) {
   /*Initialize MPI*/
   // MPI init
   int provided;
-  MPI_Init_thread( &argc, &argv, MPI_THREAD_FUNNELED, &provided);
-  
+  MPI_Init_thread( &argc, &argv, MPI_THREAD_MULTIPLE, &provided);
+  printf("provided= %i\n", provided);
   //Create one Comm per node and delete all but one MPI-process per node. Also set the omp threads.
   char *pname = malloc(MPI_MAX_PROCESSOR_NAME*sizeof(char));  //Maybe I should declare it first
   int len;
@@ -222,9 +222,9 @@ int main (int argc, char *argv[]) {
   }
 
   initialize_board (board, N);
-  printf("Board initialized\n");
+//printf("Board initialized\n");
   generate_table (board, N, thres);
-  printf("Board generated\n");
+//printf("Board generated\n");
   
   /* play game of life 100 times */
   /*debug

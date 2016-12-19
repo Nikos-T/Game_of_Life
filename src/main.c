@@ -74,28 +74,25 @@ void transfer_board(int *board, int N, int *wholeboard, int *boundaries) {
       {
         #pragma omp section
         {
-          printf("--------1-----------");
           for (int i=0; i<N; i++) {
             MPI_Recv(&coded_columns[(N+2*i)*N/8], N/8, MPI_UNSIGNED_CHAR, 1, i, my_world, &status1);    //2*N^2/8+2*i*N/8
-            printf("Received column %i from node1\n", (N+2*i));
+            //printf("Received column %i from node1\n", (N+2*i));
           }
           printf("Received all columns from node1\n");
         }
         #pragma omp section
         {
-          printf("--------2-----------");
           for (int i=0; i<N; i++) {
             MPI_Recv(&coded_columns[i*N/8], N/8, MPI_UNSIGNED_CHAR, 2, i, my_world, &status2);
-            printf("Received column %i from node2\n", i*N/8);
+            //printf("Received column %i from node2\n", i*N/8);
           }
           printf("Received all columns from node2\n");
         }
         #pragma omp section
         {
-          printf("--------3-----------");
           for (int i=0; i<N; i++) {
             MPI_Recv(&coded_columns[(N+2*i+1)*N/8], N/8, MPI_UNSIGNED_CHAR, 3, i, my_world, &status3);    //2*N^2/8+(2*i+1)*N/8
-            printf("Received column %i from node3\n", (N+2*i+1));
+            //printf("Received column %i from node3\n", (N+2*i+1));
           }
           printf("Received all columns from node3\n");
         }
@@ -127,9 +124,9 @@ void transfer_board(int *board, int N, int *wholeboard, int *boundaries) {
   }
 }
 
-//void transfer_boundaries(int *board, int N, int *boundaries) {
+void transfer_boundaries(int *board, int N, int *boundaries) {
   
-//}
+}
 
 int main (int argc, char *argv[]) {
   int   *board, *newboard, *wholeboard, i=0;
@@ -149,13 +146,12 @@ int main (int argc, char *argv[]) {
   
 
   /*Initialize MPI*/
-  // MPI init
   int provided;
   MPI_Init_thread( &argc, &argv, MPI_THREAD_MULTIPLE, &provided);
   printf("provided= %i\n", provided);
 
   //Create one Comm per node and delete all but one MPI-process per node. Also set the omp threads.
-  char *pname = malloc(MPI_MAX_PROCESSOR_NAME*sizeof(char));  //Maybe I should declare it first
+  char *pname = malloc(MPI_MAX_PROCESSOR_NAME*sizeof(char));
   int len;
   MPI_Get_processor_name(pname, &len);
   int node_key = name_to_color(pname);
@@ -164,7 +160,7 @@ int main (int argc, char *argv[]) {
   MPI_Comm_split(MPI_COMM_WORLD, node_key, 0, &my_world); //here my_world is inside-processor communicator
   int node_nthreads, threadID;
   MPI_Comm_size(my_world, &node_nthreads);
-  omp_set_num_threads(node_nthreads); //set threads per node
+  omp_set_num_threads(node_nthreads); //set omp threads per node
   MPI_Comm_rank(my_world, &threadID);
   
 
@@ -172,21 +168,22 @@ int main (int argc, char *argv[]) {
   MPI_Comm_rank(MPI_COMM_WORLD, &TID);  //TID is task ID from MPI_COMM_WORLD
   
   MPI_Comm_split(MPI_COMM_WORLD, threadID, TID, &my_world);  //here my_world is outside-processor communicator
-  MPI_Comm_size(my_world, &nNodes);
-  MPI_Comm_rank(my_world, &nodeID);
+  
+  MPI_Comm_size(my_world, &nNodes); //pass size of communicator to global variable
+  MPI_Comm_rank(my_world, &nodeID); //pass nodeID to global variable (needed for send-recv)
+  
+  //check nodes=1,2 or 4
   if (nNodes!=1 && nNodes!=2 && nNodes!=4) {
     printf("This many nodes not supported");
     MPI_Finalize();
     return(-1);
   }
-
+  //close all but one process per node
   if (threadID!=0) {
     MPI_Finalize();
     return(0);
   }
 
-  
-  
   // Input command line arguments
   int N = atoi(argv[1]);        // Array size
   N+=8-N%8;                     //for encode-decode
@@ -201,37 +198,35 @@ int main (int argc, char *argv[]) {
 
   board = (int *)malloc(N*N*sizeof(int));
   if (nodeID == 0) {
-    if (nNodes==2) {
+    if (nNodes==2) {  //in this case board doesn't need to be redefined
       board = (int *) realloc(board, 2*N*N*sizeof(int));
       wholeboard = board;
-    } else if (nNodes==4) {
+    } else if (nNodes==4) { //here column size changes so we need the variable wholeboard
       wholeboard = (int *)malloc(4*N*N*sizeof(int));
+    }
+    if ((wholeboard == NULL) && (nNodes >1)) {
+      printf("\nERROR: Memory allocation did not complete successfully!\n");
+      return (1);
     }
   }
   
   int * boundaries;
-  if (nNodes == 2) {
+  if (nNodes == 2) {  //if nodes=2 then we need to pass 2 columns to each task
     boundaries = (int *)malloc(2*N*sizeof(int));
-  } else if (nNodes == 4) {
+  } else if (nNodes == 4) { //if nodes=4 we need to pass 2 columns and to rows to each task
     boundaries = (int *)malloc(4*N*sizeof(int));
   }
   
-  if (board == NULL){
-    printf("\nERROR: Memory allocation did not complete successfully!\n");
-    return (1);
-  }
-  
   /* second pointer for updated result */
-  
   newboard = (int *)malloc(N*N*sizeof(int));
-
-  if (newboard == NULL){
+  if ((board == NULL) || ((boundaries == NULL ) && (nNodes > 1)) || (newboard == NULL)){
     printf("\nERROR: Memory allocation did not complete successfully!\n");
     return (1);
   }
 
   initialize_board (board, N);
-//printf("Board initialized\n");
+  printf("Board%i initialized\n", nodeID);
+  /*Usually every board is generated in the same second. Simply adding nodeID to time(NULL) makes the boards differ*/
   generate_table (board, N, thres, nodeID);
   printf("Board generated\n");
   

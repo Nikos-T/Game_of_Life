@@ -226,17 +226,30 @@ int main (int argc, char *argv[]) {
   generate_table (board, N, thres, nodeID);
   printf("Board generated\n");
   
-  if (nodeID==0)
-    display_table(board, N);
   MPI_Barrier(my_world);
-  if (nodeID==1)
+  if (nodeID==0) {
+    printf("=================\n");
     display_table(board, N);
+    printf("=================\n");
+  }
   MPI_Barrier(my_world);
-  if (nodeID==2)
+  if (nodeID==1) {
+    printf("=================\n");
     display_table(board, N);
+    printf("=================\n");
+  }
   MPI_Barrier(my_world);
-  if (nodeID==3)
+  if (nodeID==2) {
+    printf("=================\n");
     display_table(board, N);
+    printf("=================\n");
+  }
+  MPI_Barrier(my_world);
+  if (nodeID==3) {
+    printf("=================\n");
+    display_table(board, N);
+    printf("=================\n");
+  }
   /* play game of life 100 times */
   /*debug
   if (nNodes ==1) {

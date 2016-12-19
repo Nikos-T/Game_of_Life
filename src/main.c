@@ -19,7 +19,7 @@
 
 MPI_Comm my_world;  //inside-processor communicator
 int nodeID, nNodes;
-MPI_Status status;
+MPI_Status status, status1, status2, status3;
 bool no_realloc = true;
 
 /*https://www.archer.ac.uk/training/course-material/2015/10/AdvMPI_EPCC/S1-L04-Split-Comms.pdf*/
@@ -76,7 +76,7 @@ void transfer_board(int *board, int N, int *wholeboard, int *boundaries) {
         #pragma omp section
         {
           for (int i=0; i<N; i++) {
-            MPI_Recv(&coded_columns[(N+2*i)*N/8], N/8, MPI_UNSIGNED_CHAR, 1, i, my_world, &status);    //2*N^2/8+2*i*N/8
+            MPI_Recv(&coded_columns[(N+2*i)*N/8], N/8, MPI_UNSIGNED_CHAR, 1, i, my_world, &status1);    //2*N^2/8+2*i*N/8
             printf("Received column %i from node1\n", (N+2*i));
           }
           printf("Received all columns from node1\n");
@@ -84,7 +84,7 @@ void transfer_board(int *board, int N, int *wholeboard, int *boundaries) {
         #pragma omp section
         {
           for (int i=0; i<N; i++) {
-            MPI_Recv(&coded_columns[i*N/8], N/8, MPI_UNSIGNED_CHAR, 2, i, my_world, &status);
+            MPI_Recv(&coded_columns[i*N/8], N/8, MPI_UNSIGNED_CHAR, 2, i, my_world, &status2);
             printf("Received column %i from node2\n", i*N/8);
           }
           printf("Received all columns from node2\n");
@@ -92,7 +92,7 @@ void transfer_board(int *board, int N, int *wholeboard, int *boundaries) {
         #pragma omp section
         {
           for (int i=0; i<N; i++) {
-            MPI_Recv(&coded_columns[(N+2*i+1)*N/8], N/8, MPI_UNSIGNED_CHAR, 3, i, my_world, &status);    //2*N^2/8+(2*i+1)*N/8
+            MPI_Recv(&coded_columns[(N+2*i+1)*N/8], N/8, MPI_UNSIGNED_CHAR, 3, i, my_world, &status3);    //2*N^2/8+(2*i+1)*N/8
             printf("Received column %i from node3\n", (N+2*i+1));
           }
           printf("Received all columns from node3\n");

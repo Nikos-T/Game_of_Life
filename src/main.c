@@ -55,11 +55,11 @@ void transfer_board(int *board, int N, int *wholeboard, int *boundaries) {
         {
           #pragma omp section
           {
-            coded[i] = encode(&board[8*i]);
+            coded_b[i] = encode(&board[8*i]);
           }
           #pragma omp section
           {
-            coded[N/8+i] = encode(&board[N*(N-1)+8*i]);
+            coded_b[N/8+i] = encode(&board[N*(N-1)+8*i]);
           }
         }
       }

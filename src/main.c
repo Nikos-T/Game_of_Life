@@ -223,7 +223,7 @@ int main (int argc, char *argv[]) {
 
   initialize_board (board, N);
 //printf("Board initialized\n");
-  generate_table (board, N, thres);
+  generate_table (board, N, thres, nodeID);
 //printf("Board generated\n");
   
   /* play game of life 100 times */

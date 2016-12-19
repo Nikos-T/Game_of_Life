@@ -17,12 +17,12 @@ void initialize_board (int *board, int N) {
 
 /* generate random table */
 
-void generate_table (int *board, int N, float threshold) {
+void generate_table (int *board, int N, float threshold, int nodeID) {
 
   int   i, j;
   int counter = 0;
 
-  srand(time(NULL));
+  srand(time(NULL)+nodeID);
 
   for (j=0; j<N; j++) {
 

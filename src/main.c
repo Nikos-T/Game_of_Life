@@ -453,7 +453,7 @@ int main (int argc, char *argv[]) {
         transfer_board(board, N, wholeboard);
         if (nodeID==0) {
           display_table(wholeboard, 2*N, nNodes*N/2);
-          usleep(10000);
+          usleep(100000);
         }
       }
       transfer_boundaries(board, N, boundaries);

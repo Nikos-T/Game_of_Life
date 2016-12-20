@@ -48,14 +48,7 @@ void play2(int *board, int *newboard, int N, int *boundaries, int nNodes) {
   for (int i=1; i<N-1; i++) {
     #pragma omp parallel for
     for (int j=1; j<N-1; j++) {
-      for (k=-1; k<=1; k++) {
-        for (l=-1; l<=1; l++) {
-          /* only count if at least one of k,l isn't zero */
-          if (k || l) {
-            if (Board(i+k,j+l)) a++;
-          }
-        }
-      }
+      a=Board(i-1,j-1)+Board(i-1, j)+Board(i-1, j+1)+Board(i, j-1)+Board(i, j+1)+Board(i+1, j-1)+Board(i+1, j)+Board(i+1, j+1);
       if (a == 2) NewBoard(i,j) = Board(i,j);
       if (a == 3) NewBoard(i,j) = 1;
       if (a < 2) NewBoard(i,j) = 0;

@@ -33,6 +33,16 @@ void generate_table (int *board, int N, float threshold, int nodeID) {
   }
 }
 
+void boundar(int *board, int N, int nodeID) {
+  #pragma omp parallel for
+  for (int i=0; i<N; i+=nodeID+1) {
+    Board(0, i)=1;
+    Board(i, 0)=1;
+    Board(N-1, i)=1;
+    Board(i, N-1)=1;
+  }
+}
+
 void glider(int *board, int N) {
   Board(14,17)=1;
   Board(15,15)=1;

@@ -360,16 +360,65 @@ int main (int argc, char *argv[]) {
   MPI_Barrier(my_world);
   transfer_boundaries(board, N, boundaries);
   MPI_Barrier(my_world);
-  if (nodeID==0) for (int i=0;i<4*N+4;i++) printf("%i", boundaries[i]);
+  
+  if (nodeID==0) {
+    printf("Boundaries0\n");
+    for (int i=0;i<N;i++) printf("%i", boundaries[i]);
+    printf("\n");
+    for (int i=N;i<2*N;i++) printf("%i", boundaries[i]);
+    printf("\n");
+    for (int i=2*N;i<3*N;i++) printf("%i", boundaries[i]);
+    printf("\n");
+    for (int i=3*N;i<4*N;i++) printf("%i", boundaries[i]);
+    printf("\n");
+    for (int i=4*N; i<4*N+4;i++) printf("%i", boundaries[i]);
+  }
+  MPI_Barrier(my_world);
   printf("\n");
   MPI_Barrier(my_world);
-  if (nodeID==1) for (int i=0;i<4*N+4;i++) printf("%i", boundaries[i]);
+   if (nodeID==1) {
+    printf("Boundaries1\n");
+    for (int i=0;i<N;i++) printf("%i", boundaries[i]);
+    printf("\n");
+    for (int i=N;i<2*N;i++) printf("%i", boundaries[i]);
+    printf("\n");
+    for (int i=2*N;i<3*N;i++) printf("%i", boundaries[i]);
+    printf("\n");
+    for (int i=3*N;i<4*N;i++) printf("%i", boundaries[i]);
+    printf("\n");
+    for (int i=4*N; i<4*N+4;i++) printf("%i", boundaries[i]);
+  }
+  MPI_Barrier(my_world);
   printf("\n");
   MPI_Barrier(my_world);
-  if (nodeID==2) for (int i=0;i<4*N+4;i++) printf("%i", boundaries[i]);
+   if (nodeID==2) {
+    printf("Boundaries2\n");
+    for (int i=0;i<N;i++) printf("%i", boundaries[i]);
+    printf("\n");
+    for (int i=N;i<2*N;i++) printf("%i", boundaries[i]);
+    printf("\n");
+    for (int i=2*N;i<3*N;i++) printf("%i", boundaries[i]);
+    printf("\n");
+    for (int i=3*N;i<4*N;i++) printf("%i", boundaries[i]);
+    printf("\n");
+    for (int i=4*N; i<4*N+4;i++) printf("%i", boundaries[i]);
+  }
+  MPI_Barrier(my_world);
   printf("\n");
   MPI_Barrier(my_world);
-  if (nodeID==3) for (int i=0;i<4*N+4;i++) printf("%i", boundaries[i]);
+   if (nodeID==3) {
+    printf("Boundaries3\n");
+    for (int i=0;i<N;i++) printf("%i", boundaries[i]);
+    printf("\n");
+    for (int i=N;i<2*N;i++) printf("%i", boundaries[i]);
+    printf("\n");
+    for (int i=2*N;i<3*N;i++) printf("%i", boundaries[i]);
+    printf("\n");
+    for (int i=3*N;i<4*N;i++) printf("%i", boundaries[i]);
+    printf("\n");
+    for (int i=4*N; i<4*N+4;i++) printf("%i", boundaries[i]);
+  }
+  MPI_Barrier(my_world);
   printf("\n");
   MPI_Barrier(my_world);
   /*play game of life

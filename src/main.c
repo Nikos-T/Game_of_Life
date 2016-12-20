@@ -486,6 +486,7 @@ int main (int argc, char *argv[]) {
       if (disp) {
         transfer_board(board, N, wholeboard, boundaries);
         if (nodeID==0) display_table(wholeboard, 2*N, nNodes*N/2);
+        MPI_Barrier(my_world);
       } else {
         transfer_boundaries(board, N, boundaries);
       }

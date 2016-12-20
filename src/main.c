@@ -333,114 +333,7 @@ int main (int argc, char *argv[]) {
   MPI_Barrier(my_world);
   if (nodeID==3) display_table(board, N, N);
   MPI_Barrier(my_world);
-  /*check encoding/decoding
-  if (nodeID==0) display_table(board, N, N);
-  unsigned char encoded[N*N/8];
-  #pragma omp parallel for
-  for (int i=0; i<N*N/8; i++) {
-    encoded[i]=encode(&board[i*8]);
-  }
-  #pragma omp parallel for
-  for (int i=0; i<N*N/8; i++) {
-    decode(encoded[i], &board[i*8]);
-  }
-  if (nodeID==0) display_table(board, N, N);
-  MPI_Barrier(my_world);//check encoding decoding
-  */
-  /* check transfer table *
-  transfer_board(board, N, wholeboard);
-  if (nodeID==0) {
-    display_table(wholeboard, 2*N, 2*N);
-    //for (int i=0; i<4*N+4; i++) printf("%i", boundaries[i]);
-  }
-  MPI_Barrier(my_world);
-  //check transfer table
-  */
-  /*check transfer_boundaries
-  MPI_Barrier(my_world);
-  transfer_boundaries(board, N, boundaries);
-  MPI_Barrier(my_world);
   
-  if (nodeID==0) {
-    printf("Boundaries0\n");
-    for (int i=0;i<N;i++) printf("%i", boundaries[i]);
-    usleep(100000); 
-    printf("\n");
-    for (int i=N;i<2*N;i++) printf("%i", boundaries[i]);
-    usleep(100000); 
-    printf("\n");
-    for (int i=2*N;i<3*N;i++) printf("%i", boundaries[i]);
-    usleep(100000); 
-    printf("\n");
-    for (int i=3*N;i<4*N;i++) printf("%i", boundaries[i]);
-    usleep(100000); 
-    printf("\n");
-    for (int i=4*N; i<4*N+4;i++) printf("%i", boundaries[i]);
-    usleep(100000); 
-  }
-  MPI_Barrier(my_world);
-  printf("\n");
-  MPI_Barrier(my_world);
-   if (nodeID==1) {
-    printf("Boundaries1\n");
-    for (int i=0;i<N;i++) printf("%i", boundaries[i]);
-    usleep(100000); 
-    printf("\n");
-    for (int i=N;i<2*N;i++) printf("%i", boundaries[i]);
-    usleep(100000); 
-    printf("\n");
-    for (int i=2*N;i<3*N;i++) printf("%i", boundaries[i]);
-    usleep(100000); 
-    printf("\n");
-    for (int i=3*N;i<4*N;i++) printf("%i", boundaries[i]);
-    usleep(100000); 
-    printf("\n");
-    for (int i=4*N; i<4*N+4;i++) printf("%i", boundaries[i]);
-    usleep(100000); 
-  }
-  MPI_Barrier(my_world);
-  printf("\n");
-  MPI_Barrier(my_world);
-   if (nodeID==2) {
-    printf("Boundaries2\n");
-    for (int i=0;i<N;i++) printf("%i", boundaries[i]);
-    usleep(100000); 
-    printf("\n");
-    for (int i=N;i<2*N;i++) printf("%i", boundaries[i]);
-    usleep(100000); 
-    printf("\n");
-    for (int i=2*N;i<3*N;i++) printf("%i", boundaries[i]);
-    usleep(100000); 
-    printf("\n");
-    for (int i=3*N;i<4*N;i++) printf("%i", boundaries[i]);
-    usleep(100000); 
-    printf("\n");
-    for (int i=4*N; i<4*N+4;i++) printf("%i", boundaries[i]);
-    usleep(100000); 
-  }
-  MPI_Barrier(my_world);
-  printf("\n");
-  MPI_Barrier(my_world);
-   if (nodeID==3) {
-    printf("Boundaries3\n");
-    for (int i=0;i<N;i++) printf("%i", boundaries[i]);
-    usleep(100000); 
-    printf("\n");
-    for (int i=N;i<2*N;i++) printf("%i", boundaries[i]);
-    usleep(100000); 
-    printf("\n");
-    for (int i=2*N;i<3*N;i++) printf("%i", boundaries[i]);
-    usleep(100000); 
-    printf("\n");
-    for (int i=3*N;i<4*N;i++) printf("%i", boundaries[i]);
-    usleep(100000); 
-    printf("\n");
-    for (int i=4*N; i<4*N+4;i++) printf("%i", boundaries[i]);
-    usleep(100000); 
-  }
-  MPI_Barrier(my_world);
-  printf("\n");
-  MPI_Barrier(my_world);*/
   /*play game of life*/
   if (nNodes == 1) {
     for (int i=0; i<t; i++) {
@@ -451,6 +344,15 @@ int main (int argc, char *argv[]) {
     for (int i=0; i<t; i++) {
       if (disp) {
         transfer_board(board, N, wholeboard);
+        MPI_Barrier(my_world);
+        if (nodeID==0) display_table(board, N, N);
+        MPI_Barrier(my_world);
+        if (nodeID==1) display_table(board, N, N);
+        MPI_Barrier(my_world);
+        if (nodeID==2) display_table(board, N, N);
+        MPI_Barrier(my_world);
+        if (nodeID==3) display_table(board, N, N);
+        MPI_Barrier(my_world);
         if (nodeID==0) {
           display_table(wholeboard, 2*N, nNodes*N/2);
           usleep(100000);

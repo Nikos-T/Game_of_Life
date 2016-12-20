@@ -430,7 +430,7 @@ int main (int argc, char *argv[]) {
   
   // Input command line arguments
   int N = atoi(argv[1]);        // Array size
-  N+=8-N%8;                     // for encode-decode
+  if (N%8!=0) N+=8-N%8;  // for encode-decode
   double thres = atof(argv[2]); // Propability of life cell
   int t = atoi(argv[3]);        // Number of generations 
   int disp = atoi(argv[4]);     // Display output?

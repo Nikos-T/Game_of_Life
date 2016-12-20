@@ -44,8 +44,9 @@ void play (int *board, int *newboard, int N) {
 void play2(int *board, int *newboard, int N, int *boundaries, int nNodes) {
   
   int a=0, k, l;
-  
+  #pragma omp parallel for
   for (int i=1; i<N-1; i++) {
+    #pragma omp parallel for
     for (int j=1; j<N-1; j++) {
       for (k=-1; k<=1; k++) {
         for (l=-1; l<=1; l++) {
@@ -63,6 +64,7 @@ void play2(int *board, int *newboard, int N, int *boundaries, int nNodes) {
     }
   }
   if (nNodes == 2) {
+    #pragma omp parallel for
     for (int i=0; i<N; i++) {
       boundaries[2*N+i] = Board(0, i);
       boundaries[3*N+i] = Board(N-1, i);
@@ -74,6 +76,7 @@ void play2(int *board, int *newboard, int N, int *boundaries, int nNodes) {
     boundaries[4*N+3] = boundaries[0];
   }
   
+  #pragma omp parallel for
   for (int i=1; i<N-1; i++) {
     //j=0:
     a=boundaries[3*N+i-1]+boundaries[3*N+i]+boundaries[3*N+i+1]+Board(i-1,0)+Board(i+1,0)+Board(i-1, 1)+Board(i, 1)+Board(i+1, 1);
@@ -103,6 +106,7 @@ void play2(int *board, int *newboard, int N, int *boundaries, int nNodes) {
   }
   //corners:
   //(0,0):
+  //sections?
   a = boundaries[N]+boundaries[N+1]+boundaries[3*N]+boundaries[3*N+1]+boundaries[4*N]+Board(0,1)+Board(1,0)+Board(1,1);
   if (a == 2) NewBoard(0,0) = Board(0,0);
   if (a == 3) NewBoard(0,0) = 1;
@@ -128,6 +132,7 @@ void play2(int *board, int *newboard, int N, int *boundaries, int nNodes) {
   if (a > 3) NewBoard(N-1,N-1) = 0;
   
   /* copy the new board back into the old board */
+  #pragma omp parallel for
   for (int i=0; i<N; i++)
     for (int j=0; j<N; j++) {
       Board(i,j) = NewBoard(i,j);

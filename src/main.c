@@ -472,11 +472,9 @@ int main (int argc, char *argv[]) {
   initialize_board (board, N);
   printf("Board%i initialized\n", nodeID);
   //generate_table (board, N, thres, nodeID);  //Usually every board is generated in the same second. Simply adding nodeID to time(NULL) makes the boards differ
-  //gosper_glider_gun(board, N, nodeID);
-  //printf("Board generated\n");
-  MPI_Barrier(my_world);
-  transfer_board(board, N, wholeboard, boundaries);
-  if (nodeID==0) display_table(wholeboard, 2*N, 2*N);
+  gosper_glider_gun(board, N, nodeID);
+  printf("Board%i generated\n", nodeID);
+  
   /*play game of life*/
   if (nNodes == 1) {
     for (int i=0; i<t; i++) {

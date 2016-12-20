@@ -128,8 +128,8 @@ void play2(int *board, int *newboard, int N, int *boundaries, int nNodes) {
   if (a > 3) NewBoard(N-1,N-1) = 0;
   
   /* copy the new board back into the old board */
-  for (i=0; i<N; i++)
-    for (j=0; j<N; j++) {
+  for (int i=0; i<N; i++)
+    for (int j=0; j<N; j++) {
       Board(i,j) = NewBoard(i,j);
     }
 }

@@ -500,6 +500,7 @@ int main (int argc, char *argv[]) {
   if (nodeID==2) for (int i=0; i<4*N+4; i++) printf("%i", boundaries[i]);
   MPI_Barrier(my_world);
   if (nodeID==3) for (int i=0; i<4*N+4; i++) printf("%i", boundaries[i]);
+  MPI_Barrier(my_world);
   //check transfer table
   /*play game of life*/
   if (nNodes == 1) {

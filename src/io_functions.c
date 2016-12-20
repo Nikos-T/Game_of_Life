@@ -31,6 +31,6 @@ void display_table(int *board, int N, int M) {
   print (board, N);
   usleep(100000);  
   /* clear the screen using VT100 escape codes */
-  /*debug 
-  puts ("\033[H\033[J"); */
+  /*debug
+  puts ("\033[H\033[J");*/
 }

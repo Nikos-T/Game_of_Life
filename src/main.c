@@ -320,7 +320,8 @@ int main (int argc, char *argv[]) {
   initialize_board (board, N);
   printf("Board%i initialized\n", nodeID);
   //generate_table (board, N, thres, nodeID);  //Usually every board is generated in the same second. Simply adding nodeID to time(NULL) makes the boards differ
-  boundar(board, N, nodeID);
+  //boundar(board, N, nodeID);
+  glider(board, N);
   printf("Board%i generated\n", nodeID);
   
   MPI_Barrier(my_world);
@@ -452,7 +453,7 @@ int main (int argc, char *argv[]) {
         transfer_board(board, N, wholeboard);
         if (nodeID==0) {
           display_table(wholeboard, 2*N, nNodes*N/2);
-          usleep(100000);
+          usleep(10000);
       }
       transfer_boundaries(board, N, boundaries);
       play2(board, newboard, N, boundaries, nNodes);

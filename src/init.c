@@ -44,10 +44,10 @@ void boundar(int *board, int N, int nodeID) {
 }
 
 void glider(int *board, int N) {
-  Board(14,17)=1;
-  Board(15,15)=1;
-  Board(15,17)=1;
-  Board(16,16)=1;
-  Board(16,17)=1;
+  Board(4,7)=1;
+  Board(5,5)=1;
+  Board(5,7)=1;
+  Board(6,6)=1;
+  Board(6,7)=1;
 }
 

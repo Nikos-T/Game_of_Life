@@ -435,7 +435,9 @@ int main (int argc, char *argv[]) {
   int t = atoi(argv[3]);        // Number of generations 
   int disp = atoi(argv[4]);     // Display output?
   printf("Size %dx%d with propability: %0.1f%%\n", N, N, thres*100);
-
+  //gosper glider gun
+  N=24;
+  
   board = NULL;
   newboard = NULL;
   
@@ -469,7 +471,8 @@ int main (int argc, char *argv[]) {
 
   initialize_board (board, N);
   printf("Board%i initialized\n", nodeID);
-  generate_table (board, N, thres, nodeID);  //Usually every board is generated in the same second. Simply adding nodeID to time(NULL) makes the boards differ
+  //generate_table (board, N, thres, nodeID);  //Usually every board is generated in the same second. Simply adding nodeID to time(NULL) makes the boards differ
+  gosper_glider_gun(board, N, nodeID);
   printf("Board generated\n");
   
   /*play game of life*/

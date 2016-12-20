@@ -454,6 +454,7 @@ int main (int argc, char *argv[]) {
         if (nodeID==0) {
           display_table(wholeboard, 2*N, nNodes*N/2);
           usleep(10000);
+        }
       }
       transfer_boundaries(board, N, boundaries);
       play2(board, newboard, N, boundaries, nNodes);

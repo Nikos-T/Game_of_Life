@@ -354,7 +354,7 @@ int main (int argc, char *argv[]) {
   }
   MPI_Barrier(my_world);
   //check transfer table
-  /*play game of life*/
+  /*play game of life
   if (nNodes == 1) {
     for (int i=0; i<t; i++) {
       if (disp) display_table(board, N, N);
@@ -376,7 +376,7 @@ int main (int argc, char *argv[]) {
     transfer_board(board, N, wholeboard);
     if (nodeID==0) display_table(board, 2*N, nNodes*N/2);
   }
-  
+  */
   /*Free mallocs*/
   if (nNodes>1) free(boundaries);
   free(board);

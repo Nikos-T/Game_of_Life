@@ -472,8 +472,8 @@ int main (int argc, char *argv[]) {
   initialize_board (board, N);
   printf("Board%i initialized\n", nodeID);
   //generate_table (board, N, thres, nodeID);  //Usually every board is generated in the same second. Simply adding nodeID to time(NULL) makes the boards differ
-  gosper_glider_gun(board, N, nodeID);
-  printf("Board generated\n");
+  //gosper_glider_gun(board, N, nodeID);
+  //printf("Board generated\n");
   
   /*play game of life*/
   if (nNodes == 1) {

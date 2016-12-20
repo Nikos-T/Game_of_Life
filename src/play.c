@@ -43,7 +43,7 @@ void play (int *board, int *newboard, int N) {
 
 void play2(int *board, int *newboard, int N, int *boundaries, int nNodes) {
   
-  int a=0;
+  int a=0, k, l;
   
   for (int i=1; i<N-1; i++) {
     for (int j=1; j<N-1; j++) {

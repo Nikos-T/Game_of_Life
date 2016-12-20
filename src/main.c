@@ -285,7 +285,6 @@ int main (int argc, char *argv[]) {
   int disp = atoi(argv[4]);     // Display output?
   printf("Size %dx%d with propability: %0.1f%%\n", N, N, thres*100);
   //gosper glider gun
-  N=24;
   
   board = NULL;
   newboard = NULL;

@@ -355,7 +355,7 @@ int main (int argc, char *argv[]) {
   MPI_Barrier(my_world);
   //check transfer table
   */
-  /*check transfer_boundaries*/
+  /*check transfer_boundaries
   MPI_Barrier(my_world);
   transfer_boundaries(board, N, boundaries);
   MPI_Barrier(my_world);
@@ -439,8 +439,8 @@ int main (int argc, char *argv[]) {
   }
   MPI_Barrier(my_world);
   printf("\n");
-  MPI_Barrier(my_world);
-  /*play game of life
+  MPI_Barrier(my_world);*/
+  /*play game of life*/
   if (nNodes == 1) {
     for (int i=0; i<t; i++) {
       if (disp) display_table(board, N, N);
@@ -450,7 +450,9 @@ int main (int argc, char *argv[]) {
     for (int i=0; i<t; i++) {
       if (disp) {
         transfer_board(board, N, wholeboard);
-        if (nodeID==0) display_table(wholeboard, 2*N, nNodes*N/2);
+        if (nodeID==0) {
+          display_table(wholeboard, 2*N, nNodes*N/2);
+          usleep(100000);
       }
       transfer_boundaries(board, N, boundaries);
       play2(board, newboard, N, boundaries, nNodes);
@@ -462,7 +464,7 @@ int main (int argc, char *argv[]) {
     transfer_board(board, N, wholeboard);
     if (nodeID==0) display_table(board, 2*N, nNodes*N/2);
   }
-  */
+  
   /*Free mallocs*/
   if (nNodes>1) free(boundaries);
   free(board);

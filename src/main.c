@@ -323,6 +323,15 @@ int main (int argc, char *argv[]) {
   //generate_table (board, N, thres, nodeID);  //Usually every board is generated in the same second. Simply adding nodeID to time(NULL) makes the boards differ
   glider(board, N, nodeID);
   printf("Board%i generated\n", nodeID);
+  MPI_Barrier(my_world);
+  if (nodeID==0) display_table(board, N, N);
+  MPI_Barrier(my_world);
+  if (nodeID==1) display_table(board, N, N);
+  MPI_Barrier(my_world);
+  if (nodeID==2) display_table(board, N, N);
+  MPI_Barrier(my_world);
+  if (nodeID==3) display_table(board, N, N);
+  MPI_Barrier(my_world);
   /*check encoding/decoding
   if (nodeID==0) display_table(board, N, N);
   unsigned char encoded[N*N/8];
@@ -343,12 +352,6 @@ int main (int argc, char *argv[]) {
     display_table(wholeboard, 2*N, 2*N);
     //for (int i=0; i<4*N+4; i++) printf("%i", boundaries[i]);
   }
-  MPI_Barrier(my_world);
-  if (nodeID==1) for (int i=0; i<4*N+4; i++) printf("%i", boundaries[i]);
-  MPI_Barrier(my_world);
-  if (nodeID==2) for (int i=0; i<4*N+4; i++) printf("%i", boundaries[i]);
-  MPI_Barrier(my_world);
-  if (nodeID==3) for (int i=0; i<4*N+4; i++) printf("%i", boundaries[i]);
   MPI_Barrier(my_world);
   //check transfer table
   /*play game of life*/

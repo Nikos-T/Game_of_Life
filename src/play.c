@@ -43,7 +43,7 @@ void play (int *board, int *newboard, int N) {
 
 void play2(int *board, int *newboard, int N, int *boundaries, int nNodes) {
   
-  int a=0, k, l;
+  int a=0;
   #pragma omp parallel for
   for (int i=1; i<N-1; i++) {
     #pragma omp parallel for

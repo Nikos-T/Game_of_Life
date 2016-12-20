@@ -33,22 +33,11 @@ void generate_table (int *board, int N, float threshold, int nodeID) {
   }
 }
 
-void gosper_glider_gun (int *board, int N, int nodeID) {
-  int i[17]={1, 1, 2, 2, 9, 9, 10, 10, 11, 11, 17, 17, 17, 18, 19, 23, 23};
-  int j[17]={11, 12, 11, 12, 12, 13, 11, 13, 11, 12, 13, 14, 15, 13, 14, 10, 11};
-  int m[17]={0, 0, 1, 1, 1, 1, 2, 2, 11, 11, 12, 12, 12, 12, 12, 13, 14};
-  int n[17]={9, 11, 9, 10, 21, 22, 21, 23, 21, 9, 10, 9, 10, 16, 18, 16, 17};
-  
-  switch (nodeID) {
-    case 0:
-      for (int k=0; k<17; k++) {
-        Board(i[k], j[k])=1;
-      }
-    case 1:
-      for (int k=0; k<17; k++) {
-        Board(m[k], n[k])=1;
-      }
-  }
-  
+void glider(int *board, int N, int nodeID) {
+  Board(14,17)=1;
+  Board(15,15)=1;
+  Board(15,17)=1;
+  Board(16,16)=1;
+  Board(16,17)=1;
 }
 

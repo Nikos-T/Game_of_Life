@@ -104,6 +104,13 @@ void transfer_board(int *board, int N, int *wholeboard, int *boundaries) {
       }
     }
   } else if (nNodes ==4) {
+    int corners[4];
+    if (nodeID!=3) {
+      corners[0] = Board(N-1,N-1);
+      corners[1] = Board(N-1,0);
+      corners[2] = Board(0,N-1);
+      corners[3] = Board(0,0);
+    }
     unsigned char coded_b[N/2];
     int uncoded_b[2*N];
     #pragma omp parallel for
@@ -150,6 +157,7 @@ void transfer_board(int *board, int N, int *wholeboard, int *boundaries) {
       //send boundaries
       MPI_Send(coded_b, N/4, MPI_UNSIGNED_CHAR, 1, 0, my_world);
       MPI_Send(&coded_b[N/4], N/4, MPI_UNSIGNED_CHAR, 2, 1, my_world);
+      MPI_Send(corners, 4, MPI_INT, 3, 0, my_world);
       
       #pragma omp parallel for
       for (int i=0; i<N; i++) {
@@ -191,6 +199,10 @@ void transfer_board(int *board, int N, int *wholeboard, int *boundaries) {
         }
       }
       //create boundaries:
+      boundaries[4*N] = wholeboard[4*N*N-1];
+      boundaries[4*N+1] = wholeboard[4*N*N-N];
+      boundaries[4*N+2] = wholeboard[2*N*(N+1)-1]; //543
+      boundaries[4*N+3] = wholeboard[2*N*N+N];  //528
       #pragma omp parallel for
       for (int i=0; i<N; i++) {
         #pragma omp parallel sections
@@ -218,22 +230,28 @@ void transfer_board(int *board, int N, int *wholeboard, int *boundaries) {
         decode(coded_columns[i], &wholeboard[N*N+8*i]);
       }
     } else {
+      //send-recv boundaries
       switch (nodeID) {
         case 1:
           MPI_Send(&coded_b[N/4], N/4, MPI_UNSIGNED_CHAR, 3, 1, my_world);
+          MPI_Send(corners, 4, MPI_INT, 2, 0, my_world);
           MPI_Recv(coded_b, N/4, MPI_UNSIGNED_CHAR, 0, 0, my_world, &status);
           MPI_Recv(&coded_b[N/4], N/4, MPI_UNSIGNED_CHAR, 3, 1, my_world, &status);
+          MPI_Recv(&boundaries[4*N], 4, MPI_INT, 2, 0, my_world, &status);
           break;
         case 2:
           MPI_Send(coded_b, N/4, MPI_UNSIGNED_CHAR, 3, 0, my_world);
+          MPI_Send(corners, 4, MPI_INT, 1, 0, my_world);
           MPI_Recv(coded_b, N/4, MPI_UNSIGNED_CHAR, 3, 0, my_world, &status);
           MPI_Recv(&coded_b[N/4], N/4, MPI_UNSIGNED_CHAR, 0, 1, my_world, &status);
+          MPI_Recv(&boundaries[4*N], 4, MPI_INT, 1, 0, my_world, &status);
           break;
         case 3:
           MPI_Send(coded_b, N/4, MPI_UNSIGNED_CHAR, 2, 0, my_world);
           MPI_Send(&coded_b[N/4], N/4, MPI_UNSIGNED_CHAR, 1, 1, my_world);
           MPI_Recv(coded_b, N/4, MPI_UNSIGNED_CHAR, 2, 0, my_world, &status);
           MPI_Recv(&coded_b[N/4], N/4, MPI_UNSIGNED_CHAR, 1, 1, my_world, &status);
+          MPI_Recv(&boundaries[4*N], 4, MPI_INT, 0, 0, my_world, &status);
           break;
       }
       //decode boundaries:
@@ -259,6 +277,7 @@ void transfer_board(int *board, int N, int *wholeboard, int *boundaries) {
 void transfer_boundaries(int *board, int N, int *boundaries) {
   unsigned char coded[N/2];
   int uncoded[2*N];
+  int corners[4];
   //rows to columns:
   if (nNodes == 4) {
     #pragma omp parallel for
@@ -275,6 +294,10 @@ void transfer_boundaries(int *board, int N, int *boundaries) {
         }
       }
     }
+    corners[0] = Board(N-1,N-1);
+    corners[1] = Board(N-1,0);
+    corners[2] = Board(0,N-1);
+    corners[3] = Board(0,0);
   }
   //encode:
   #pragma omp parallel for
@@ -311,25 +334,37 @@ void transfer_boundaries(int *board, int N, int *boundaries) {
   switch(nodeID) {  //tag 0 means column, tag 1 means row
     case 0:
       MPI_Send(coded, N/4, MPI_UNSIGNED_CHAR, 1, 0, my_world);
-      if (nNodes==4)  MPI_Send(&coded[N/4], N/4, MPI_UNSIGNED_CHAR, 2, 1, my_world);
+      if (nNodes==4) {
+        MPI_Send(corners, 4, MPI_INT, 3, 0, my_world);
+        MPI_Send(&coded[N/4], N/4, MPI_UNSIGNED_CHAR, 2, 1, my_world);
+        MPI_Recv(&boundaries[4*N], 4, MPI_INT, 3, 0, my_world, &status);
+        MPI_Recv(&coded[N/4], N/4, MPI_UNSIGNED_CHAR, 2, 1, my_world, &status);
+      }
       MPI_Recv(coded, N/4, MPI_UNSIGNED_CHAR, 1, 0, my_world, &status);
-      if (nNodes==4)  MPI_Recv(&coded[N/4], N/4, MPI_UNSIGNED_CHAR, 2, 1, my_world, &status);
       break;
     case 1:
       MPI_Send(coded, N/4, MPI_UNSIGNED_CHAR, 0, 0, my_world);
-      if (nNodes==4)  MPI_Send(&coded[N/4], N/4, MPI_UNSIGNED_CHAR, 3, 1, my_world);
+      if (nNodes==4) {
+        MPI_Send(corners, 4, MPI_INT, 2, 0, my_world);
+        MPI_Send(&coded[N/4], N/4, MPI_UNSIGNED_CHAR, 3, 1, my_world);
+        MPI_Recv(&boundaries[4*N], 4, MPI_INT, 2, 0, my_world, &status);
+        MPI_Recv(&coded[N/4], N/4, MPI_UNSIGNED_CHAR, 3, 1, my_world, &status);
+      }
       MPI_Recv(coded, N/4, MPI_UNSIGNED_CHAR, 0, 0, my_world, &status);
-      if (nNodes==4)  MPI_Recv(&coded[N/4], N/4, MPI_UNSIGNED_CHAR, 3, 1, my_world, &status);
       break;
     case 2:
       MPI_Send(coded, N/4, MPI_UNSIGNED_CHAR, 3, 0, my_world);
+      MPI_Send(corners, 4, MPI_INT, 1, 0, my_world);
       MPI_Send(&coded[N/4], N/4, MPI_UNSIGNED_CHAR, 0, 1, my_world);
+      MPI_Recv(&boundaries[4*N], 4, MPI_INT, 1, 0, my_world, &status);
       MPI_Recv(coded, N/4, MPI_UNSIGNED_CHAR, 3, 0, my_world, &status);
       MPI_Recv(&coded[N/4], N/4, MPI_UNSIGNED_CHAR, 0, 1, my_world, &status);
       break;
     case 3:
       MPI_Send(coded, N/4, MPI_UNSIGNED_CHAR, 2, 0, my_world);
+      MPI_Send(corners, 4, MPI_INT, 0, 0, my_world);
       MPI_Send(&coded[N/4], N/4, MPI_UNSIGNED_CHAR, 1, 1, my_world);
+      MPI_Recv(&boundaries[4*N], 4, MPI_INT, 0, 0, my_world, &status);
       MPI_Recv(coded, N/4, MPI_UNSIGNED_CHAR, 2, 0, my_world, &status);
       MPI_Recv(&coded[N/4], N/4, MPI_UNSIGNED_CHAR, 1, 1, my_world, &status);
       break;
@@ -421,10 +456,8 @@ int main (int argc, char *argv[]) {
   
   /*Define boundaries*/
   int * boundaries;
-  if (nNodes == 2) {  //if nodes=2 then we need to pass 2 columns to each task
-    boundaries = (int *)malloc(2*N*sizeof(int));
-  } else if (nNodes == 4) { //if nodes=4 we need to pass 2 columns and to rows to each task
-    boundaries = (int *)malloc(4*N*sizeof(int));
+  if (nNodes >1) {
+    boundaries = (int *)malloc(4*(N+1)*sizeof(int));
   }
   
   /* second pointer for updated result */
@@ -443,7 +476,7 @@ int main (int argc, char *argv[]) {
   if (nNodes == 1) {
     for (int i=0; i<t; i++) {
       if (disp) display_table(board, N, N);
-      play(board, newboard, N, boundaries);
+      play(board, newboard, N);
     }
   } else {
     for (int i=0; i<t; i++) {
@@ -453,7 +486,7 @@ int main (int argc, char *argv[]) {
       } else {
         transfer_boundaries(board, N, boundaries);
       }
-      play(board, newboard, N, boundaries);
+      play2(board, newboard, N, boundaries, nNodes);
     }
   }
   

@@ -33,7 +33,7 @@ void generate_table (int *board, int N, float threshold, int nodeID) {
   }
 }
 
-void glider(int *board, int N, int nodeID) {
+void glider(int *board, int N) {
   Board(14,17)=1;
   Board(15,15)=1;
   Board(15,17)=1;

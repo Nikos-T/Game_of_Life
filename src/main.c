@@ -474,7 +474,19 @@ int main (int argc, char *argv[]) {
   //generate_table (board, N, thres, nodeID);  //Usually every board is generated in the same second. Simply adding nodeID to time(NULL) makes the boards differ
   glider(board, N, nodeID);
   printf("Board%i generated\n", nodeID);
-  
+  //check encoding/decoding
+  if (nodeID==0) display_table(board, N, N);
+  unsigned char encoded[N*N/8];
+  #pragma omp parallel for
+  for (int i=0; i<N*N/8; i++) {
+    encoded[i]=encode(&board[i*8]);
+  }
+  #pragma omp parallel for
+  for (int i=0; i<N*N/8; i++) {
+    decode(encoded[i], &board[i*8]);
+  }
+  if (nodeID==0) display_table(board, N, N);
+  MPI_Barrier(my_world);
   /*play game of life*/
   if (nNodes == 1) {
     for (int i=0; i<t; i++) {
@@ -486,11 +498,12 @@ int main (int argc, char *argv[]) {
       if (disp) {
         transfer_board(board, N, wholeboard, boundaries);
         if (nodeID==0) display_table(wholeboard, 2*N, nNodes*N/2);
-        MPI_Barrier(my_world);
       } else {
         transfer_boundaries(board, N, boundaries);
       }
+      
       play2(board, newboard, N, boundaries, nNodes);
+      MPI_Barrier(my_world);
     }
   }
   

@@ -271,7 +271,7 @@ int main (int argc, char *argv[]) {
     return(-1);
   }
   }
-  
+  printf("\nNum threads = %i\n", omp_get_num_threads());
   // Input command line arguments
   int N = atoi(argv[1]);        // Array size
   if (N%8!=0) N+=8-N%8;  // for encode-decode
@@ -324,7 +324,7 @@ int main (int argc, char *argv[]) {
   time(&end);
   printf("%is to generate Board\nBoard%i generated\n", end-start, nodeID);
   
-  /*play game of life
+  /*play game of life*/
   if (nNodes == 1) {
     for (int i=0; i<t; i++) {
       if (disp) display_table(board, N, N);
@@ -332,6 +332,7 @@ int main (int argc, char *argv[]) {
     }
   } else {
     for (int i=0; i<t; i++) {
+      time(&start);
       if (disp) {
         transfer_board(board, N, wholeboard);
         if (nodeID==0) {
@@ -341,10 +342,12 @@ int main (int argc, char *argv[]) {
       }
       transfer_boundaries(board, N, boundaries);
       play2(board, newboard, N, boundaries, 4);
+      time(&end);
+      printf("\nNode%i\n%is to play round\n", nodeID, end-start);
       MPI_Barrier(my_world);
     }
   }
-  */
+  
   /*doesn't work correctly
   if (disp) { //diplay finish board
     transfer_board(board, N, wholeboard);

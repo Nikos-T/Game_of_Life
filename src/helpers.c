@@ -40,7 +40,7 @@ int adjacent_to (int *board, int i, int j, int N) {
   return count;
 }
 
-void alive_or_dead_center(int *board, int i, int j, int N) {
+void alive_or_dead_center(int *board, int i, int j, int N, int *newboard) {
   
   int count = 0;
   

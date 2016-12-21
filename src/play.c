@@ -68,7 +68,7 @@ void play2(int *board, int *newboard, int N, int *boundaries, int nNodes) {
   for (int i=1; i<N-1; i++) {
     #pragma omp parallel sections
     {
-    //j=0
+      
       #pragma omp section
       {
         a[i-1]=boundaries[3*N+i-1]+boundaries[3*N+i]+boundaries[3*N+i+1]+Board(i-1,0)+Board(i+1, 0)+Board(i-1,1)+Board(i,1)+Board(i+1,1); 
@@ -109,43 +109,42 @@ void play2(int *board, int *newboard, int N, int *boundaries, int nNodes) {
   }
   //corners:
   //(0,0):
-  int a, b, c, d;
   #pragma omp parallel sections
   {
     #pragma omp section
     {
-      a = boundaries[N]+boundaries[N+1]+boundaries[3*N]+boundaries[3*N+1]+boundaries[4*N]+Board(0,1)+Board(1,0)+Board(1,1);
-      if (a == 2) NewBoard(0,0) = Board(0,0);
-      if (a == 3) NewBoard(0,0) = 1;
-      if (a < 2) NewBoard(0,0) = 0;
-      if (a > 3) NewBoard(0,0) = 0;
+      a[0] = boundaries[N]+boundaries[N+1]+boundaries[3*N]+boundaries[3*N+1]+boundaries[4*N]+Board(0,1)+Board(1,0)+Board(1,1);
+      if (a[0] == 2) NewBoard(0,0) = Board(0,0);
+      if (a[0] == 3) NewBoard(0,0) = 1;
+      if (a[0] < 2) NewBoard(0,0) = 0;
+      if (a[0] > 3) NewBoard(0,0) = 0;
     }
   //(0, N-1):
     #pragma omp section
     {
-      b = boundaries[3*N]+boundaries[3*N+1]+boundaries[2*N-1]+boundaries[2*N-2]+boundaries[4*N+1]+Board(0, N-2)+Board(1, N-2)+Board(1, N-1);
-      if (b == 2) NewBoard(0,N-1) = Board(0,N-1);
-      if (b == 3) NewBoard(0,N-1) = 1;
-      if (b < 2) NewBoard(0,N-1) = 0;
-      if (b > 3) NewBoard(0,N-1) = 0;
+      a[1] = boundaries[3*N]+boundaries[3*N+1]+boundaries[2*N-1]+boundaries[2*N-2]+boundaries[4*N+1]+Board(0, N-2)+Board(1, N-2)+Board(1, N-1);
+      if (a[1] == 2) NewBoard(0,N-1) = Board(0,N-1);
+      if (a[1] == 3) NewBoard(0,N-1) = 1;
+      if (a[1] < 2) NewBoard(0,N-1) = 0;
+      if (a[1] > 3) NewBoard(0,N-1) = 0;
     }
   //(N-1, 0):
     #pragma omp section
     {
-      c = boundaries[0]+boundaries[1]+boundaries[4*N-1]+boundaries[4*N-2]+boundaries[4*N+2]+Board(N-2, 0)+Board(N-2, 1)+Board(N-1, 1);
-      if (c == 2) NewBoard(N-1,0) = Board(N-1,0);
-      if (c == 3) NewBoard(N-1,0) = 1;
-      if (c < 2) NewBoard(N-1,0) = 0;
-      if (c > 3) NewBoard(N-1,0) = 0;
+      a[2] = boundaries[0]+boundaries[1]+boundaries[4*N-1]+boundaries[4*N-2]+boundaries[4*N+2]+Board(N-2, 0)+Board(N-2, 1)+Board(N-1, 1);
+      if (a[2] == 2) NewBoard(N-1,0) = Board(N-1,0);
+      if (a[2] == 3) NewBoard(N-1,0) = 1;
+      if (a[2] < 2) NewBoard(N-1,0) = 0;
+      if (a[2] > 3) NewBoard(N-1,0) = 0;
     }
   //(N-1, N-1):
     #pragma omp section
     {
-      d = boundaries[N-1]+boundaries[N-2]+boundaries[3*N-1]+boundaries[3*N-2]+boundaries[4*N+3]+Board(N-1, N-2)+Board(N-2, N-1)+Board(N-2,N-2);
-      if (d == 2) NewBoard(N-1,N-1) = Board(N-1,N-1);
-      if (d == 3) NewBoard(N-1,N-1) = 1;
-      if (d < 2) NewBoard(N-1,N-1) = 0;
-      if (d > 3) NewBoard(N-1,N-1) = 0;
+      a[3] = boundaries[N-1]+boundaries[N-2]+boundaries[3*N-1]+boundaries[3*N-2]+boundaries[4*N+3]+Board(N-1, N-2)+Board(N-2, N-1)+Board(N-2,N-2);
+      if (a[3] == 2) NewBoard(N-1,N-1) = Board(N-1,N-1);
+      if (a[3] == 3) NewBoard(N-1,N-1) = 1;
+      if (a[3] < 2) NewBoard(N-1,N-1) = 0;
+      if (a[3] > 3) NewBoard(N-1,N-1) = 0;
     }
   }
   /* copy the new board back into the old board */

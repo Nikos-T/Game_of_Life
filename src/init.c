@@ -11,8 +11,8 @@ void initialize_board (int *board, int N) {
   
   #pragma omp parallel for collapse(2)
   for (int i=0; i<N; i++) {
-    printf("omp num threads = %i\n", omp_get_num_threads());
     for (int j=0; j<N; j++) {
+      if (i==0 && j==0) printf("omp num threads = %i", omp_get_num_threads());
       Board(i,j) = 0;
     }
   }

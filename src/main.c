@@ -220,7 +220,8 @@ void transfer_boundaries(int *board, int N, int *boundaries) {
 
 int main (int argc, char *argv[]) {
   int   *board, *newboard, *wholeboard;
-
+  time_t start, pre_init;
+  time(&start);
   if (argc != 5) { // Check if the command line arguments are correct 
     printf( "Usage: %s N thres disp\n"
             "where\n"
@@ -234,6 +235,7 @@ int main (int argc, char *argv[]) {
   }
   
   /*Initialize MPI*/
+  {
   int provided;
   MPI_Init_thread( &argc, &argv, MPI_THREAD_MULTIPLE, &provided);
   if (provided!=3) {
@@ -241,7 +243,6 @@ int main (int argc, char *argv[]) {
     MPI_Finalize();
     return(3);
   }
-
   /*Procedure to delete all but one task per node
    * Firstly we create MPI_Comm which splits MPI_COMM_WORLD based on processor name and get an "inside-node" communicator
    * Secondly we set the number of openMP threads based on the "inside-node" comm size
@@ -268,6 +269,7 @@ int main (int argc, char *argv[]) {
     printf("This many nodes not supported");
     MPI_Finalize();
     return(-1);
+  }
   }
   
   // Input command line arguments
@@ -309,7 +311,8 @@ int main (int argc, char *argv[]) {
     printf("\nERROR: Memory allocation did not complete successfully!\n");
     return (1);
   }
-
+  time(&pre_init);
+  printf("\n%i\nReady to initialize board\n%i\n", start, pre_init);
   initialize_board (board, N);
   printf("Board%i initialized\n", nodeID);
   //generate_table (board, N, thres, nodeID);  //Usually every board is generated in the same second. Simply adding nodeID to time(NULL) makes the boards differ
@@ -338,18 +341,17 @@ int main (int argc, char *argv[]) {
       if (disp) {
         transfer_board(board, N, wholeboard);
         if (nodeID==0) {
-          printf("Generation %i\n", i);
+          printf("\nGeneration %i\n", i);
           display_table(wholeboard, 2*N, nNodes*N/2);
-          usleep(100000);
         }
       }
       transfer_boundaries(board, N, boundaries);
-      MPI_Barrier(my_world);
       play2(board, newboard, N, boundaries, 4);
       MPI_Barrier(my_world);
     }
   }
   
+  /*doesn't work correctly*/
   if (disp) { //diplay finish board
     transfer_board(board, N, wholeboard);
     if (nodeID==0) display_table(board, 2*N, nNodes*N/2);

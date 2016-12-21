@@ -19,7 +19,7 @@ int yadd (int i, int a, int N);
 /* return the number of on cells adjacent to the i,j cell */
 
 int adjacent_to (int *board, int i, int j, int N);
-void alive_or_dead_center(int *board, int i, int j, int N) ;
+void alive_or_dead_center(int *board, int i, int j, int N, int *newboard) ;
 
 /* play the game through one generation */
 

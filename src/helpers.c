@@ -40,3 +40,21 @@ int adjacent_to (int *board, int i, int j, int N) {
   return count;
 }
 
+void alive_or_dead_center(int *board, int i, int j, int N) {
+  
+  int count = 0;
+  
+  for (int k=-1; k<=1; k++) {
+    for (int l=-1; l<=1; l++) {
+      if (k||l) {
+        if (Board(i+k, j+l)) {
+          count++;
+        }
+      }
+    }
+  }
+  if (count == 2) NewBoard(i,j) = Board(i,j);
+  if (count == 3) NewBoard(i,j) = 1;
+  if (count < 2) NewBoard(i,j) = 0;
+  if (count > 3) NewBoard(i,j) = 0;
+}

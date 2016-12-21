@@ -24,7 +24,7 @@ void generate_table (int *board, int N, float threshold, int nodeID) {
   int   i, j;
   
   srand(time(NULL)+nodeID);
-  #pragma omp parallel for
+  #pragma omp parallel for num_threads(8)
   for (i=0; i<N; i++) {
     if (i=0) printf("\nNum threads = %i\n", omp_get_num_threads());
     for (j=0; j<N; j++) {

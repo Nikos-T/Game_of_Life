@@ -271,7 +271,7 @@ int main (int argc, char *argv[]) {
     return(-1);
   }
   }
-  printf("\nNum threads = %i\n", omp_get_num_threads());
+
   // Input command line arguments
   int N = atoi(argv[1]);        // Array size
   if (N%8!=0) N+=8-N%8;  // for encode-decode

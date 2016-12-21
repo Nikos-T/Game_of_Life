@@ -7,7 +7,7 @@
 
 module load mpi/mpich3-x86_64
 cd $PBS_O_WORKDIR
-
+export OMP_NUM_THREADS=8
 echo "=====test Run starts now ======= `date` "
 
 mpiexec -np $PBS_NP ./../bin/game-of-life 40000 0.2 3 0 &> $PBS_JOBNAME.log

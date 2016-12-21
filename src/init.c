@@ -26,13 +26,13 @@ void generate_table (int *board, int N, float threshold, int nodeID) {
   srand(time(NULL)+nodeID);
   #pragma omp parallel for
   for (j=0; j<N; j++) {
-    #pragma omp parallel for
     for (i=0; i<N; i++) {
       Board(i,j) = ( (float)rand() / (float)RAND_MAX ) < threshold;
     }
   }
 }
 
+/*this function serves to test function transfer_boundaries*/
 void boundar(int *board, int N, int nodeID) {
   #pragma omp parallel for
   for (int i=0; i<N; i+=nodeID+1) {

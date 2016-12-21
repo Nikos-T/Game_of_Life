@@ -318,9 +318,11 @@ int main (int argc, char *argv[]) {
   initialize_board (board, N);
   time(&end);
   printf("\n%is to initialize Board\nBoard%i initialized\n", end-start, nodeID);
-  //generate_table (board, N, thres, nodeID);  //Usually every board is generated in the same second. Simply adding nodeID to time(NULL) makes the boards differ
-  glider(board, N, nodeID);
-  printf("Board%i generated\n", nodeID);
+  time(&start);
+  generate_table (board, N, thres, nodeID);  //Usually every board is generated in the same second. Simply adding nodeID to time(NULL) makes the boards differ
+  //glider(board, N, nodeID); //for debug purposes
+  time(&end);
+  printf("%is to generate Board\nBoard%i generated\n", end-start, nodeID);
   
   /*play game of life
   if (nNodes == 1) {
@@ -334,7 +336,7 @@ int main (int argc, char *argv[]) {
         transfer_board(board, N, wholeboard);
         if (nodeID==0) {
           printf("\nGeneration %i\n", i);
-          display_table(wholeboard, 2*N, nNodes*N/2);
+          display_table(wholeboard, 2*N, nNodes*N/2); //function needs editing for nNodes=2
         }
       }
       transfer_boundaries(board, N, boundaries);

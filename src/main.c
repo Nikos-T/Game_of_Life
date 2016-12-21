@@ -332,6 +332,7 @@ int main (int argc, char *argv[]) {
     }
   } else {
     for (int i=0; i<t; i++) {
+      MPI_Barrier(my_world);
       time(&start);
       if (disp) {
         transfer_board(board, N, wholeboard);
@@ -344,7 +345,6 @@ int main (int argc, char *argv[]) {
       play2(board, newboard, N, boundaries, 4);
       time(&end);
       printf("\nNode%i\n%is to play round\n", nodeID, end-start);
-      MPI_Barrier(my_world);
     }
   }
   

@@ -311,26 +311,16 @@ int main (int argc, char *argv[]) {
     printf("\nERROR: Memory allocation did not complete successfully!\n");
     return (1);
   }
+  
   time(&pre_init);
   printf("\n%i\nReady to initialize board\n%i\n", start, pre_init);
-  initialize_board (board, N);
+  /*initialize_board (board, N);
   printf("Board%i initialized\n", nodeID);
   //generate_table (board, N, thres, nodeID);  //Usually every board is generated in the same second. Simply adding nodeID to time(NULL) makes the boards differ
-  //boundar(board, N, nodeID);
   glider(board, N, nodeID);
   printf("Board%i generated\n", nodeID);
-  
-  MPI_Barrier(my_world);
-  if (nodeID==0) display_table(board, N, N);
-  MPI_Barrier(my_world);
-  if (nodeID==1) display_table(board, N, N);
-  MPI_Barrier(my_world);
-  if (nodeID==2) display_table(board, N, N);
-  MPI_Barrier(my_world);
-  if (nodeID==3) display_table(board, N, N);
-  MPI_Barrier(my_world);
-  
-  /*play game of life*/
+  */
+  /*play game of life
   if (nNodes == 1) {
     for (int i=0; i<t; i++) {
       if (disp) display_table(board, N, N);
@@ -350,13 +340,13 @@ int main (int argc, char *argv[]) {
       MPI_Barrier(my_world);
     }
   }
-  
-  /*doesn't work correctly*/
+  */
+  /*doesn't work correctly
   if (disp) { //diplay finish board
     transfer_board(board, N, wholeboard);
     if (nodeID==0) display_table(board, 2*N, nNodes*N/2);
   }
-  
+  */
   /*Free mallocs*/
   if (nNodes>1) free(boundaries);
   free(board);

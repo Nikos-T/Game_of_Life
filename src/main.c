@@ -360,7 +360,7 @@ int main (int argc, char *argv[]) {
       }
       transfer_boundaries(board, N, boundaries);
       MPI_Barrier(my_world);
-      play(board, newboard, N);
+      play2(board, newboard, N);
       MPI_Barrier(my_world);
     }
   }

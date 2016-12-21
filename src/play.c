@@ -80,7 +80,7 @@ void play2(int *board, int *newboard, int N, int *boundaries, int nNodes) {
     //j=N-1:
       #pragma omp section
       {
-        b[i-1]=boundaries[2*N+i-1]+boundaries[2*N+i]+boundaries[2*N+i+1]+Board(i-1, N-1)+Board(i-1, N-1)+Board(i-1, N-2)+Board(i, N-2)+Board(i+1, N-2);
+        b[i-1]=boundaries[2*N+i-1]+boundaries[2*N+i]+boundaries[2*N+i+1]+Board(i-1, N-1)+Board(i+1, N-1)+Board(i-1, N-2)+Board(i, N-2)+Board(i+1, N-2);
         if (b[i-1] == 2) NewBoard(i,N-1) = Board(i,N-1);
         if (b[i-1] == 3) NewBoard(i,N-1) = 1;
         if (b[i-1] < 2) NewBoard(i,N-1) = 0;

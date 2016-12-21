@@ -22,7 +22,7 @@ void initialize_board (int *board, int N) {
 void generate_table (int *board, int N, float threshold, int nodeID) {
 
   int   i, j;
-  
+  omp_set_num_threads(8);
   srand(time(NULL)+nodeID);
   #pragma omp parallel for num_threads(8)
   for (i=0; i<N; i++) {

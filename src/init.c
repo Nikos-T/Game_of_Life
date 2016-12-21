@@ -9,10 +9,13 @@
 
 void initialize_board (int *board, int N) {
   int   i, j;
-  
-  for (i=0; i<N; i++)
-    for (j=0; j<N; j++) 
+  #pragma omp parallel for
+  for (i=0; i<N; i++) {
+    #pragma omp parallel for
+    for (j=0; j<N; j++) {
       Board(i,j) = 0;
+    }
+  }
 }
 
 /* generate random table */
@@ -20,15 +23,13 @@ void initialize_board (int *board, int N) {
 void generate_table (int *board, int N, float threshold, int nodeID) {
 
   int   i, j;
-  int counter = 0;
-
+  
   srand(time(NULL)+nodeID);
-
+  #pragma omp parallel for
   for (j=0; j<N; j++) {
-
+    #pragma omp parallel for
     for (i=0; i<N; i++) {
       Board(i,j) = ( (float)rand() / (float)RAND_MAX ) < threshold;
-      counter += Board(i,j);
     }
   }
 }
@@ -43,11 +44,13 @@ void boundar(int *board, int N, int nodeID) {
   }
 }
 
-void glider(int *board, int N) {
-  Board(4,7)=1;
-  Board(5,5)=1;
-  Board(5,7)=1;
-  Board(6,6)=1;
-  Board(6,7)=1;
+void glider(int *board, int N, int nodeID) {
+  if (nodeID==0) {
+    Board(4,7)=1;
+    Board(5,5)=1;
+    Board(5,7)=1;
+    Board(6,6)=1;
+    Board(6,7)=1;
+  }
 }
 

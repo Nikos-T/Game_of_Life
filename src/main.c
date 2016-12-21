@@ -321,7 +321,7 @@ int main (int argc, char *argv[]) {
   printf("Board%i initialized\n", nodeID);
   //generate_table (board, N, thres, nodeID);  //Usually every board is generated in the same second. Simply adding nodeID to time(NULL) makes the boards differ
   //boundar(board, N, nodeID);
-  glider(board, N);
+  glider(board, N, nodeID);
   printf("Board%i generated\n", nodeID);
   
   MPI_Barrier(my_world);

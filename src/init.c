@@ -4,13 +4,14 @@
 #include <unistd.h>
 
 #include <game-of-life.h>
-
+#include <omp.h>
 /* set everthing to zero */
 
 void initialize_board (int *board, int N) {
   int   i, j;
   #pragma omp parallel for
   for (i=0; i<N; i++) {
+    fprintf("omp num threads = %i\n", omp_get_num_threads());
     for (j=0; j<N; j++) {
       Board(i,j) = 0;
     }
@@ -22,11 +23,9 @@ void initialize_board (int *board, int N) {
 void generate_table (int *board, int N, float threshold, int nodeID) {
 
   int   i, j;
-  omp_set_num_threads(8);
   srand(time(NULL)+nodeID);
-  #pragma omp parallel for num_threads(8)
+  #pragma omp parallel for
   for (i=0; i<N; i++) {
-    if (i=0) printf("\nNum threads = %i\n", omp_get_num_threads());
     for (j=0; j<N; j++) {
       Board(i,j) = ( (float)rand() / (float)RAND_MAX ) < threshold;
     }

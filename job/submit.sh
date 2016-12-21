@@ -10,7 +10,7 @@ cd $PBS_O_WORKDIR
 
 echo "=====test Run starts now ======= `date` "
 
-mpiexec -np $PBS_NP ./../bin/game-of-life 16 0.2 10 1 &> $PBS_JOBNAME.log
+mpiexec -np $PBS_NP ./../bin/game-of-life 16 0.2 20 1 &> $PBS_JOBNAME.log
 
 
 echo "====test Run ends now ======= `date` "

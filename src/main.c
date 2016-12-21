@@ -344,15 +344,6 @@ int main (int argc, char *argv[]) {
     for (int i=0; i<t; i++) {
       if (disp) {
         transfer_board(board, N, wholeboard);
-        MPI_Barrier(my_world);
-        if (nodeID==0) display_table(board, N, N);
-        MPI_Barrier(my_world);
-        if (nodeID==1) display_table(board, N, N);
-        MPI_Barrier(my_world);
-        if (nodeID==2) display_table(board, N, N);
-        MPI_Barrier(my_world);
-        if (nodeID==3) display_table(board, N, N);
-        MPI_Barrier(my_world);
         if (nodeID==0) {
           display_table(wholeboard, 2*N, nNodes*N/2);
           usleep(100000);

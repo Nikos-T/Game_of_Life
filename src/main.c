@@ -338,6 +338,7 @@ int main (int argc, char *argv[]) {
       if (disp) {
         transfer_board(board, N, wholeboard);
         if (nodeID==0) {
+          printf("Generation %i\n", t);
           display_table(wholeboard, 2*N, nNodes*N/2);
           usleep(100000);
         }

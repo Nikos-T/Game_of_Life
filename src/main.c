@@ -319,8 +319,8 @@ int main (int argc, char *argv[]) {
   time(&end);
   printf("\n%is to initialize Board\nBoard%i initialized\n", end-start, nodeID);
   time(&start);
-  //generate_table (board, N, thres, nodeID);  //Usually every board is generated in the same second. Simply adding nodeID to time(NULL) makes the boards differ
-  glider(board, N, nodeID); //for debug purposes
+  generate_table (board, N, thres, nodeID);  //Usually every board is generated in the same second. Simply adding nodeID to time(NULL) makes the boards differ
+  //glider(board, N, nodeID); //for debug purposes
   time(&end);
   printf("%is to generate Board\nBoard%i generated\n", end-start, nodeID);
   

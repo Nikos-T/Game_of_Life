@@ -220,7 +220,7 @@ void transfer_boundaries(int *board, int N, int *boundaries) {
 
 int main (int argc, char *argv[]) {
   int   *board, *newboard, *wholeboard;
-  time_t start, pre_init;
+  time_t start, end;
   time(&start);
   if (argc != 5) { // Check if the command line arguments are correct 
     printf( "Usage: %s N thres disp\n"
@@ -312,10 +312,12 @@ int main (int argc, char *argv[]) {
     return (1);
   }
   
-  time(&pre_init);
-  printf("\n%i\nReady to initialize board\n%i\n", start, pre_init);
-  /*initialize_board (board, N);
-  printf("Board%i initialized\n", nodeID);
+  time(&end);
+  printf("\n%is to configure MPI\nReady to initialize board\n", (int)(end-start));
+  time(&start);
+  initialize_board (board, N);
+  time(&end);
+  printf("\n%is to initialize Board\nBoard%i initialized\n", end-start, nodeID);
   //generate_table (board, N, thres, nodeID);  //Usually every board is generated in the same second. Simply adding nodeID to time(NULL) makes the boards differ
   glider(board, N, nodeID);
   printf("Board%i generated\n", nodeID);

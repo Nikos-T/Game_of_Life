@@ -11,7 +11,6 @@ void initialize_board (int *board, int N) {
   int   i, j;
   #pragma omp parallel for
   for (i=0; i<N; i++) {
-    #pragma omp parallel for
     for (j=0; j<N; j++) {
       Board(i,j) = 0;
     }

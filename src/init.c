@@ -8,8 +8,8 @@
 /* set everthing to zero */
 
 void initialize_board (int *board, int N) {
-  int   i, j;
-  #pragma omp parallel for
+  
+  #pragma omp parallel for collapse(2)
   for (i=0; i<N; i++) {
     fprintf("omp num threads = %i\n", omp_get_num_threads());
     for (j=0; j<N; j++) {
@@ -22,7 +22,6 @@ void initialize_board (int *board, int N) {
 
 void generate_table (int *board, int N, float threshold, int nodeID) {
 
-  int   i, j;
   srand(time(NULL)+nodeID);
   #pragma omp parallel for
   for (i=0; i<N; i++) {

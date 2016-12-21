@@ -4,6 +4,7 @@
 #include <unistd.h>
 
 #include <game-of-life.h>
+#include <omp.h>
 
 void play (int *board, int *newboard, int N) {
   /*

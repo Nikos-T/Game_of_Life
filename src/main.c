@@ -337,7 +337,7 @@ int main (int argc, char *argv[]) {
         transfer_board(board, N, wholeboard);
         if (nodeID==0) {
           printf("\nGeneration %i\n", i);
-          display_table(wholeboard, 2*N, nNodes*N/2); //function needs editing for nNodes=2
+          display_table(wholeboard, 2*N, nNodes*N/2);
         }
       }
       transfer_boundaries(board, N, boundaries);

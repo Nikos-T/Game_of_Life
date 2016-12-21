@@ -24,8 +24,8 @@ void generate_table (int *board, int N, float threshold, int nodeID) {
   srand(time(NULL)+nodeID);
   #pragma omp parallel for collapse(2)
   for (int i=0; i<N; i++) {
-    printf("Node%i, i=%i\n", nodeID, i);
     for (int j=0; j<N; j++) {
+      if (j==0) printf("Node%i, i=%i\n", nodeID, i);
       Board(i,j) = ( (float)rand() / (float)RAND_MAX ) < threshold;
     }
   }

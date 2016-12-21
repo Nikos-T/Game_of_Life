@@ -53,8 +53,8 @@ void play2(int *board, int *newboard, int N, int *boundaries, int nNodes) {
   if (nNodes == 2) {
     #pragma omp parallel for
     for (int i=0; i<N; i++) {
-      boundaries[2*N+i] = Board(0, i);
-      boundaries[3*N+i] = Board(N-1, i);
+      boundaries[2*N+i] = Board(i, 0);
+      boundaries[3*N+i] = Board(i, N-1);
     }
     //corners:
     boundaries[4*N] = boundaries[2*N-1];
@@ -63,51 +63,53 @@ void play2(int *board, int *newboard, int N, int *boundaries, int nNodes) {
     boundaries[4*N+3] = boundaries[0];
   }
   
-  int a, b, c, d;
+  int a[N-2], b[N-2], c[N-2], d[N-2];
   #pragma omp parallel for
   for (int i=1; i<N-1; i++) {
     #pragma omp parallel sections
     {
+    //j=0
       #pragma omp section
       {
-        a=boundaries[3*N+i-1]+boundaries[3*N+i]+boundaries[3*N+i+1]+Board(i-1,0)+Board(i+1,0)+Board(i-1, 1)+Board(i, 1)+Board(i+1, 1);
-        if (a == 2) NewBoard(i,0) = Board(i,0);
-        if (a == 3) NewBoard(i,0) = 1;
-        if (a < 2) NewBoard(i,0) = 0;
-        if (a > 3) NewBoard(i,0) = 0;
+        a[i-1]=boundaries[3*N+i-1]+boundaries[3*N+i]+boundaries[3*N+i+1]+Board(i-1,0)+Board(i+1, 0)+Board(i-1,1)+Board(i,1)+Board(i+1,1); 
+        if (a[i-1] == 2) NewBoard(i,0) = Board(i,0);
+        if (a[i-1] == 3) NewBoard(i,0) = 1;
+        if (a[i-1] < 2) NewBoard(i,0) = 0;
+        if (a[i-1] > 3) NewBoard(i,0) = 0;
       }
     //j=N-1:
       #pragma omp section
       {
-        b=boundaries[2*N+i-1]+boundaries[2*N+i]+boundaries[2*N+i+1]+Board(i-1, N-1)+Board(i+1, N+1)+Board(i-1, N-2)+Board(i, N-2)+Board(i+1, N-2);
-        if (b == 2) NewBoard(i,N-1) = Board(i,N-1);
-        if (b == 3) NewBoard(i,N-1) = 1;
-        if (b < 2) NewBoard(i,N-1) = 0;
-        if (b > 3) NewBoard(i,N-1) = 0;
+        b[i-1]=boundaries[2*N+i-1]+boundaries[2*N+i]+boundaries[2*N+i+1]+Board(i-1, N-1)+Board(i+1, N+1)+Board(i-1, N-2)+Board(i, N-2)+Board(i+1, N-2);
+        if (b[i-1] == 2) NewBoard(i,N-1) = Board(i,N-1);
+        if (b[i-1] == 3) NewBoard(i,N-1) = 1;
+        if (b[i-1] < 2) NewBoard(i,N-1) = 0;
+        if (b[i-1] > 3) NewBoard(i,N-1) = 0;
       }
     //from here i means j and opposite
     //i=0:
       #pragma omp section
       {
-        c = boundaries[N+i-1]+boundaries[N+i]+boundaries[N+i+1]+Board(0, i-1)+Board(0, i+1)+Board(1, i-1)+Board(1, i)+Board(1, i+1);
-        if (c == 2) NewBoard(0,i) = Board(0,i);
-        if (c == 3) NewBoard(0,i) = 1;
-        if (c < 2) NewBoard(0,i) = 0;
-        if (c > 3) NewBoard(0,i) = 0;
+        c[i-1] = boundaries[N+i-1]+boundaries[N+i]+boundaries[N+i+1]+Board(0, i-1)+Board(0, i+1)+Board(1, i-1)+Board(1, i)+Board(1, i+1);
+        if (c[i-1] == 2) NewBoard(0,i) = Board(0,i);
+        if (c[i-1] == 3) NewBoard(0,i) = 1;
+        if (c[i-1] < 2) NewBoard(0,i) = 0;
+        if (c[i-1] > 3) NewBoard(0,i) = 0;
       }
     //i=N-1
       #pragma omp section
       {
-        d = boundaries[i-1]+boundaries[i]+boundaries[i+1]+Board(N-1, i-1)+Board(N-1, i+1)+Board(N-2, i-1)+Board(N-2,i)+Board(N-2, i+1);
-        if (d == 2) NewBoard(N-1,i) = Board(N-1,i);
-        if (d == 3) NewBoard(N-1,i) = 1;
-        if (d < 2) NewBoard(N-1,i) = 0;
-        if (d > 3) NewBoard(N-1,i) = 0;
+        d[i-1] = boundaries[i-1]+boundaries[i]+boundaries[i+1]+Board(N-1, i-1)+Board(N-1, i+1)+Board(N-2, i-1)+Board(N-2,i)+Board(N-2, i+1);
+        if (d[i-1] == 2) NewBoard(N-1,i) = Board(N-1,i);
+        if (d[i-1] == 3) NewBoard(N-1,i) = 1;
+        if (d[i-1] < 2) NewBoard(N-1,i) = 0;
+        if (d[i-1] > 3) NewBoard(N-1,i) = 0;
       }
     }
   }
   //corners:
   //(0,0):
+  int a, b, c, d;
   #pragma omp parallel sections
   {
     #pragma omp section

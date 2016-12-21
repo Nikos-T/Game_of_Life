@@ -20,8 +20,10 @@ void initialize_board (int *board, int N) {
 /* generate random table */
 
 void generate_table (int *board, int N, float threshold, int nodeID) {
-
-  srand(time(NULL)+nodeID);
+  #pragma omp parallel
+  {
+    srand(time(NULL)*nodeID+omp_get_thread_num());
+  }
   int thres = threshold*RAND_MAX;
 /*#pragma omp parallel for collapse(2)
   for (int j=0; j<N; j++) {

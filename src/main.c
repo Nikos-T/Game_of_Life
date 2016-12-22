@@ -63,7 +63,9 @@ void transfer_board(int *board, int N, int *wholeboard) {
     }
   } else if (nNodes ==4) {
     if (nodeID == 0) {
+      printf("to initialize coded_columns\n");
       unsigned char coded_columns[3*N*N/8];
+      printf("coded_columns initialized\n");
       #pragma omp parallel for
       for (int i=0; i<N; i++) {
         memcpy(&wholeboard[2*N*i], &board[N*i], N*sizeof(int)); //copy board0 to wholeboard
@@ -102,7 +104,9 @@ void transfer_board(int *board, int N, int *wholeboard) {
         decode(coded_columns[i], &wholeboard[N*N+8*i]);
       }
     } else {
+      printf("Node%i to initialize\n", nodeID);
       unsigned char coded_columns[N*N/8];
+      printf("Node%i coded columns initialized\n", nodeID);
       //encode:
       #pragma omp parallel for
       for (int i=0; i<N*N/8; i++) {

@@ -349,10 +349,13 @@ int main (int argc, char *argv[]) {
   }
   
   /*display finish board*/
+  time(&start);
   transfer_board(board, N, wholeboard);
-  if (nodeID==0) {
+  time(&end);
+  printf("\nNode%i\n%is to exit transfer_board\n", nodeID, end-start);
+  if (disp && nodeID==0) {
     printf("Finish Board:\n");
-    display_table(wholeboard, 2*N, nNodes*N/2);
+    //display_table(wholeboard, 2*N, nNodes*N/2);
   }
   /*Free mallocs*/
   if (nNodes>1) free(boundaries);

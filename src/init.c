@@ -30,10 +30,12 @@ void generate_table (int *board, int N, float threshold, int nodeID) {
     }
   }*/
   int res[omg_get_num_threads()];
+  int thrID;
   #pragma omp parallel for
   for (int i=0; i<N*N; i++) {
+    thrID=omp_get_thread_num();
     #pragma omp critical
-    res[omp_get_thread_num()] = rand();
+    res[thrID] = rand();
     board[i] = res[omp_get_thread_num()] < thres;
   }
 }

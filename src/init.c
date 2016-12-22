@@ -53,7 +53,7 @@ void boundar(int *board, int N, int nodeID) {
 }
 
 void glider(int *board, int N, int nodeID) {
-  if (nodeID==0) {
+  if (1) {
     Board(4,7)=1;
     Board(5,5)=1;
     Board(5,7)=1;

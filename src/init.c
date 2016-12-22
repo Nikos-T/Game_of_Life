@@ -24,8 +24,8 @@ void generate_table (int *board, int N, float threshold, int nodeID) {
   srand(time(NULL)*(nodeID+1));
   int thres = threshold*RAND_MAX;
 
-  for (int j=0; j<N; j++) {
-    for (int i=0; i<N; i++) {
+  for (int i=0; i<N; i++) {
+    for (int j=0; j<N; j++) {
       Board(i,j) = rand() < thres;
     }
   }

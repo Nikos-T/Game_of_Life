@@ -36,7 +36,7 @@ void generate_table (int *board, int N, float threshold, int nodeID) {
     thrID=omp_get_thread_num();
     #pragma omp critical
     res[thrID] = rand();
-    board[i] = res[omp_get_thread_num()] < thres;
+    board[i] = res[thrID] < thres;
   }
 }
 

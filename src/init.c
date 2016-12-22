@@ -23,12 +23,13 @@ void generate_table (int *board, int N, float threshold, int nodeID) {
   
   srand(time(NULL)*(nodeID+1));
   int thres = threshold*RAND_MAX;
-/*#pragma omp parallel for collapse(2)
+
   for (int j=0; j<N; j++) {
     for (int i=0; i<N; i++) {
       Board(i,j) = rand() < thres;
     }
-  }*/
+  }
+  /*
   int res[omp_get_num_threads()];
   int thrID;
   #pragma omp parallel for
@@ -37,7 +38,7 @@ void generate_table (int *board, int N, float threshold, int nodeID) {
     #pragma omp critical
     res[thrID] = rand();
     board[i] = res[thrID] < thres;
-  }
+  }*/
 }
 
 /*this function serves to test function transfer_boundaries*/

@@ -64,35 +64,33 @@ void transfer_board(int *board, int N, int *wholeboard) {
   } else if (nNodes ==4) {
     if (nodeID == 0) {
       unsigned char coded_columns[3*N*N/8];
-      //receive:
-      #pragma omp parallel sections nowait
-      {
-        #pragma omp section
-        {
-          for (int i=0; i<N; i++) {
-            MPI_Recv(&coded_columns[(N+2*i)*N/8], N/8, MPI_UNSIGNED_CHAR, 1, i, my_world, &status1);    //2*N^2/8+2*i*N/8
-          }
-        }
-        #pragma omp section
-        {
-          for (int i=0; i<N; i++) {
-            MPI_Recv(&coded_columns[i*N/8], N/8, MPI_UNSIGNED_CHAR, 2, i, my_world, &status2);
-          }
-        }
-        #pragma omp section
-        {
-          for (int i=0; i<N; i++) {
-            MPI_Recv(&coded_columns[(N+2*i+1)*N/8], N/8, MPI_UNSIGNED_CHAR, 3, i, my_world, &status3);    //2*N^2/8+(2*i+1)*N/8
-          }
-        }
-      }
-      /*do this while receiving*/
       #pragma omp parallel for
       for (int i=0; i<N; i++) {
         memcpy(&wholeboard[2*N*i], &board[N*i], N*sizeof(int)); //copy board0 to wholeboard
       }
-      /*after receiving everything:*/
-      #pragma omp barrier
+      //receive:
+      #pragma omp parallel sections
+      {
+        #pragma omp section
+        {
+          for (int i=0; i<N; i++) {
+            MPI_Recv(&coded_columns[(N+2*i)*N/8], N/8, MPI_UNSIGNED_CHAR, 1, i, my_world, &status);    //2*N^2/8+2*i*N/8
+          }
+        }
+        #pragma omp section
+        {
+          for (int i=0; i<N; i++) {
+            MPI_Recv(&coded_columns[i*N/8], N/8, MPI_UNSIGNED_CHAR, 2, i, my_world, &status);
+          }
+        }
+        #pragma omp section
+        {
+          for (int i=0; i<N; i++) {
+            MPI_Recv(&coded_columns[(N+2*i+1)*N/8], N/8, MPI_UNSIGNED_CHAR, 3, i, my_world, &status);    //2*N^2/8+(2*i+1)*N/8
+          }
+        }
+      }
+      //decode:
       #pragma omp parallel for
       for (int i=0; i<N; i++) {
         for (int j=0; j<N/8; j++) {

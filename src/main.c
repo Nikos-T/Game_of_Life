@@ -18,7 +18,7 @@
 
 MPI_Comm my_world;  //inside-processor communicator
 int nodeID, nNodes;
-MPI_Status status, status1, status2, status3;
+MPI_Status status;
 
 /*https://www.archer.ac.uk/training/course-material/2015/10/AdvMPI_EPCC/S1-L04-Split-Comms.pdf*/
 int name_to_color(char *processor_name) {
@@ -64,12 +64,8 @@ void transfer_board(int *board, int N, int *wholeboard) {
   } else if (nNodes ==4) {
     if (nodeID == 0) {
       unsigned char coded_columns[3*N*N/8];
-      #pragma omp parallel for
-      for (int i=0; i<N; i++) {
-        memcpy(&wholeboard[2*N*i], &board[N*i], N*sizeof(int)); //copy board0 to wholeboard
-      }
       //receive:
-      #pragma omp parallel sections
+      #pragma omp parallel sections nowait
       {
         #pragma omp section
         {
@@ -90,7 +86,13 @@ void transfer_board(int *board, int N, int *wholeboard) {
           }
         }
       }
-      //decode:
+      /*do this while receiving*/
+      #pragma omp parallel for
+      for (int i=0; i<N; i++) {
+        memcpy(&wholeboard[2*N*i], &board[N*i], N*sizeof(int)); //copy board0 to wholeboard
+      }
+      /*after receiving everything:*/
+      #pragma omp barrier
       #pragma omp parallel for
       for (int i=0; i<N; i++) {
         for (int j=0; j<N/8; j++) {

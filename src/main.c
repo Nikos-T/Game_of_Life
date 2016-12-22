@@ -348,12 +348,12 @@ int main (int argc, char *argv[]) {
     }
   }
   
-  /*doesn't work correctly
-  if (disp) { //diplay finish board
-    transfer_board(board, N, wholeboard);
-    if (nodeID==0) display_table(board, 2*N, nNodes*N/2);
+  /*display finish board*/
+  transfer_board(board, N, wholeboard);
+  if (nodeID==0) {
+    printf("Finish Board:\n");
+    display_table(wholeboard, 2*N, nNodes*N/2);
   }
-  */
   /*Free mallocs*/
   if (nNodes>1) free(boundaries);
   free(board);

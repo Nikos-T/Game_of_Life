@@ -29,7 +29,7 @@ void generate_table (int *board, int N, float threshold, int nodeID) {
       Board(i,j) = rand() < thres;
     }
   }*/
-  int res[omg_get_num_threads()];
+  int res[omp_get_num_threads()];
   int thrID;
   #pragma omp parallel for
   for (int i=0; i<N*N; i++) {

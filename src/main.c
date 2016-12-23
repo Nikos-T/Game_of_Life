@@ -19,6 +19,7 @@
 MPI_Comm my_world;  //inside-processor communicator
 int nodeID, nNodes;
 MPI_Status status;
+time_t start, end;
 
 /*https://www.archer.ac.uk/training/course-material/2015/10/AdvMPI_EPCC/S1-L04-Split-Comms.pdf*/
 int name_to_color(char *processor_name) {
@@ -71,6 +72,7 @@ void transfer_board(int *board, int N, int *wholeboard) {
         memcpy(&wholeboard[2*N*i], &board[N*i], N*sizeof(int)); //copy board0 to wholeboard
       }
       //receive:
+      
       #pragma omp parallel sections
       {
         #pragma omp section
@@ -99,15 +101,23 @@ void transfer_board(int *board, int N, int *wholeboard) {
           decode(coded_columns[i*N/8+j], &wholeboard[(2*i+1)*N+8*j]);
         }
       }
+      time(&start);
       #pragma omp parallel for
       for (int i=N*N/8; i<3*N*N/8; i++) {
         decode(coded_columns[i], &wholeboard[N*N+8*i]);
       }
+      time(&end);
+      printf("%i seconds to copy board2,3\n", (int)(end-start));
     } else {
       printf("Node%i to initialize\n", nodeID);
       unsigned char *coded_columns;
       coded_columns = (unsigned char *)malloc(N*N/8*sizeof(unsigned char));
       printf("Node%i coded columns initialized\n", nodeID);
+      if (coded_columns==NULL) {
+        printf("Node%i allocation failed", nodeID);
+        MPI_Finalize();
+        exit(1);
+      }
       //encode:
       #pragma omp parallel for
       for (int i=0; i<N*N/8; i++) {
@@ -225,7 +235,6 @@ void transfer_boundaries(int *board, int N, int *boundaries) {
 
 int main (int argc, char *argv[]) {
   int   *board, *newboard, *wholeboard;
-  time_t start, end;
   time(&start);
   if (argc != 6) { // Check if the command line arguments are correct 
     printf( "Usage: %s N thres disp\n"
@@ -323,13 +332,13 @@ int main (int argc, char *argv[]) {
   time(&start);
   initialize_board (board, N);
   time(&end);
-  printf("\n%is to initialize Board\nBoard%i initialized\n", end-start, nodeID);
+  printf("\n%is to initialize Board\nBoard%i initialized\n", (int)(end-start), nodeID);
   time(&start);
   //generate_table (board, N, thres, nodeID);  //Usually every board is generated in the same second. Simply adding nodeID to time(NULL) makes the boards differ
   if (glid) glider(board, N, nodeID); //for debug purposes
   else generate_table (board, N, thres, nodeID);
   time(&end);
-  printf("%is to generate Board\nBoard%i generated\n", end-start, nodeID);
+  printf("%is to generate Board\nBoard%i generated\n", (int)(end-start), nodeID);
   
   /*play game of life*/
   if (nNodes == 1) {
@@ -351,15 +360,15 @@ int main (int argc, char *argv[]) {
       transfer_boundaries(board, N, boundaries);
       play2(board, newboard, N, boundaries, 4);
       time(&end);
-      printf("\nNode%i\n%is to play round\n", nodeID, end-start);
+      printf("\nNode%i\n%is to play round\n", nodeID, (int)(end-start));
     }
   }
   
   /*display finish board*/
-  time(&start);
+  
   transfer_board(board, N, wholeboard);
-  time(&end);
-  printf("\nNode%i\n%is to exit transfer_board\n", nodeID, end-start);
+  
+  printf("\nNode%i\n%is to exit transfer_board\n", nodeID, (int)(end-start));
   if (disp && nodeID==0) {
     printf("Finish Board:\n");
     //display_table(wholeboard, 2*N, nNodes*N/2);

@@ -64,10 +64,15 @@ void transfer_board(int *board, int N, int *wholeboard) {
     }
   } else if (nNodes ==4) {
     if (nodeID == 0) {
-      printf("to initialize coded_columns\n");
+      
       unsigned char *coded_columns;
       coded_columns = (unsigned char *)malloc(3*N*N/8*sizeof(unsigned char));
       printf("coded_columns initialized\n");
+      if (coded_columns == NULL) {
+        printf("coded_columns0 allocation failed\n");
+        MPI_Finalize();
+        exit(1);
+      }
       #pragma omp parallel for
       for (int i=0; i<N; i++) {
         memcpy(&wholeboard[2*N*i], &board[N*i], N*sizeof(int)); //copy board0 to wholeboard

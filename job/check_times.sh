@@ -1,5 +1,5 @@
 #!/bin/bash
-#PBS -N game-of-life
+#PBS -N GoL-check_times
 
 #PBS -q pdlab
 #PBS -j oe
@@ -10,6 +10,6 @@ cd $PBS_O_WORKDIR
 export OMP_NUM_THREADS=8
 echo "=====test Run starts now ======= `date` "
 
-mpiexec -np $PBS_NP ./../bin/game-of-life 40000 0.2 3 0 &> $PBS_JOBNAME.log
+mpiexec -np $PBS_NP ./../bin/game-of-life 20000 0.2 3 0 1&> $PBS_JOBNAME.log
 
 echo "====test Run ends now ======= `date` "

@@ -226,14 +226,14 @@ int main (int argc, char *argv[]) {
   int   *board, *newboard, *wholeboard;
   time_t start, end;
   time(&start);
-  if (argc != 5) { // Check if the command line arguments are correct 
+  if (argc != 6) { // Check if the command line arguments are correct 
     printf( "Usage: %s N thres disp\n"
             "where\n"
             "  N     : size of table (N x N)\n"
             "  thres : propability of alive cell\n"
             "  t     : number of generations\n"
             "  disp  : {1: display output, 0: hide output}\n"
-
+            "  glid  : {1: use glider, 0:random}\n"
            , argv[0]);
     return (1);
   }
@@ -282,6 +282,7 @@ int main (int argc, char *argv[]) {
   double thres = atof(argv[2]); // Propability of life cell
   int t = atoi(argv[3]);        // Number of generations 
   int disp = atoi(argv[4]);     // Display output?
+  int glid = atoi(argv[5]);
   printf("Size %dx%d with propability: %0.1f%%\n", N, N, thres*100);
   //gosper glider gun
   
@@ -324,7 +325,8 @@ int main (int argc, char *argv[]) {
   printf("\n%is to initialize Board\nBoard%i initialized\n", end-start, nodeID);
   time(&start);
   //generate_table (board, N, thres, nodeID);  //Usually every board is generated in the same second. Simply adding nodeID to time(NULL) makes the boards differ
-  glider(board, N, nodeID); //for debug purposes
+  if (glid) glider(board, N, nodeID); //for debug purposes
+  else generate_table (board, N, thres, nodeID);
   time(&end);
   printf("%is to generate Board\nBoard%i generated\n", end-start, nodeID);
   

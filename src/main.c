@@ -105,7 +105,8 @@ void transfer_board(int *board, int N, int *wholeboard) {
       }
     } else {
       printf("Node%i to initialize\n", nodeID);
-      unsigned char coded_columns[N*N/8];
+      unsigned char *coded_columns;
+      coded_columns = (unsigned char *)malloc(N*N/8*sizeof(unsigned char));
       printf("Node%i coded columns initialized\n", nodeID);
       //encode:
       #pragma omp parallel for

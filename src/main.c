@@ -374,7 +374,6 @@ int main (int argc, char *argv[]) {
   
   transfer_board(board, N, wholeboard);
   
-  printf("\nNode%i\n%is to exit transfer_board\n", nodeID, (int)(end-start));
   if (disp && nodeID==0) {
     printf("Finish Board:\n");
     //display_table(wholeboard, 2*N, nNodes*N/2);

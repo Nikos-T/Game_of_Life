@@ -23,17 +23,11 @@ void initialize_board (int *board, int N) {
 void generate_table (int *board, int N, float threshold, int nodeID) {
   time_t start, end;
   
+  srand(time(NULL)*(nodeID+1));
   int thres = threshold*RAND_MAX;
   time(&start);
-  #pragma omp parallel
-  {
-  srand(time(NULL)*(nodeID+1)+omp_get_thread_num());
-  #pragma omp for collapse(2)
-  for (int i=0; i<N; i++) {
-    for (int j=0; j<N; j++) {
-      Board(i,j) = rand();
-    }
-  }
+  for (int i=0; i<N*N; i++) {
+    board[i]=rand();
   }
   time(&end);
   printf("Node%i:\n%i seconds to populate with rands\n", nodeID, (int)(end-start));

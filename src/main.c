@@ -333,20 +333,17 @@ int main (int argc, char *argv[]) {
     return (1);
   }
   
-  time(&end);
-  printf("\n%is to configure MPI\nReady to initialize board\n", (int)(end-start));
   time(&start);
   initialize_board (board, N);
   time(&end);
   printf("\n%is to initialize Board\nBoard%i initialized\n", (int)(end-start), nodeID);
-  time(&start);
+  MPI_Barrier(my_world);
   //generate_table (board, N, thres, nodeID);  //Usually every board is generated in the same second. Simply adding nodeID to time(NULL) makes the boards differ
   if (glid) glider(board, N, nodeID); //for debug purposes
   else generate_table (board, N, thres, nodeID);
-  time(&end);
   printf("%is to generate Board\nBoard%i generated\n", (int)(end-start), nodeID);
   
-  /*play game of life*/
+  /*do not play game of life
   if (nNodes == 1) {
     for (int i=0; i<t; i++) {
       if (disp) display_table(board, N, N);
@@ -369,8 +366,8 @@ int main (int argc, char *argv[]) {
       printf("\nNode%i\n%is to play round\n", nodeID, (int)(end-start));
     }
   }
-  
-  /*display finish board*/
+  */
+  /*no finish board
   
   transfer_board(board, N, wholeboard);
   
@@ -378,6 +375,7 @@ int main (int argc, char *argv[]) {
     printf("Finish Board:\n");
     //display_table(wholeboard, 2*N, nNodes*N/2);
   }
+  */
   /*Free mallocs*/
   if (nNodes>1) free(boundaries);
   free(board);

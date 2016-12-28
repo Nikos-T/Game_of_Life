@@ -7,7 +7,7 @@
 
 /* print the life board */
 
-void print (int *board, int N) {
+void print(int *board, int N) {
   int   i, j;
 
   /* for each row */
@@ -28,7 +28,7 @@ void print (int *board, int N) {
 /* display the table with delay and clear console */
 
 void display_table(int *board, int N) {
-  print (board, N);
+  print(board, N);
   usleep(100000);  
   /* clear the screen using VT100 escape codes */
   /*debug

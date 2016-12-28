@@ -28,7 +28,7 @@ void play2 (int *board, int *newboard, int N, int *boundaries, int nNodes);
 
 /* print the life board */
 
-void print (int *board, int N, int M);
+void print (int *board, int N);
 
 /* generate random table */
 

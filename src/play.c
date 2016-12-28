@@ -54,8 +54,8 @@ void play2(int *board, int *newboard, int N, int *boundaries, int nNodes) {
   if (nNodes == 2) {
     #pragma omp parallel for
     for (int i=0; i<N; i++) {
-      boundaries[2*N+i] = Board(i, 0);
-      boundaries[3*N+i] = Board(i, N-1);
+      boundaries[2*N+i] = Board(i, N-1);
+      boundaries[3*N+i] = Board(i, 0);
     }
     //corners:
     boundaries[4*N] = boundaries[2*N-1];

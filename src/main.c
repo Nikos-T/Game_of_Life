@@ -160,10 +160,13 @@ void display_table2(int *board, int N) {
       for (int i=0; i<N; i++) {
         printf ("%c", Board(i,j) ? 'x' : ' ');
       }
-      printf("\n===============\n");
+      printf("\n");
     }
   }
+  
+  
   if (nNodes == 2) {
+    if (nodeID == 1) printf("\n======================\n");
     return;
   }
   
@@ -181,8 +184,11 @@ void display_table2(int *board, int N) {
       for (int i=0; i<N; i++) {
         printf ("%c", Board(i,j) ? 'x' : ' ');
       }
-      printf("\n===============\n");
+      printf("\n");
     }
+  }
+  if (nodeID==3) {
+    printf("\n========================\n");
   }
 }
 

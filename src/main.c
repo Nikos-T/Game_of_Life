@@ -146,6 +146,46 @@ void transfer_boundaries(int *board, int N, int *boundaries) {
   }
 }
 
+void display_table2(int *board, int N) {
+  for (int j=0; j<N; j++) {
+    MPI_Barrier(my_world);
+    if (nodeID==0) {
+      for (int i=0; i<N; i++) {
+        printf ("%c", Board(i,j) ? 'x' : ' ');
+        //usleep??
+      }
+    }
+    MPI_Barrier(my_world);
+    if (nodeID==1) {
+      for (int i=0; i<N; i++) {
+        printf ("%c", Board(i,j) ? 'x' : ' ');
+        //usleep??
+      }
+    }
+  }
+  if (nNodes == 2) {
+    return;
+  }
+  
+  for (int j=0; j<N; j++) {
+    MPI_Barrier(my_world);
+    if (nodeID==2) {
+      for (int i=0; i<N; i++) {
+        printf ("%c", Board(i,j) ? 'x' : ' ');
+        //usleep??
+      }
+    }
+    MPI_Barrier(my_world);
+    if (nodeID==3) {
+      for (int i=0; i<N; i++) {
+        printf ("%c", Board(i,j) ? 'x' : ' ');
+        //usleep??
+      }
+    }
+  }
+  
+}
+
 int main (int argc, char *argv[]) {
   int   *board, *newboard, *wholeboard;
   time(&start);
@@ -170,12 +210,7 @@ int main (int argc, char *argv[]) {
     MPI_Finalize();
     return(3);
   }
-  /*Procedure to delete all but one task per node
-   * Firstly we create MPI_Comm which splits MPI_COMM_WORLD based on processor name and get an "inside-node" communicator
-   * Secondly we set the number of openMP threads based on the "inside-node" comm size
-   * Thirldly we split MPI_COMM_WORLD based on ranks of the "inside-node" comm and get the node communicator
-   * Fourthly we pass the size and ranks of the node communicator to global vars
-   * Lastly we delete all but one process per node based on the ranks of the "inside-node" comm (first communicator)*/
+  /*Procedure to delete all but one task per node*/
   char *pname = malloc(MPI_MAX_PROCESSOR_NAME*sizeof(char));
   int len, node_key, node_nthreads, threadID, TID;
   MPI_Get_processor_name(pname, &len);
@@ -250,7 +285,7 @@ int main (int argc, char *argv[]) {
   else generate_table (board, N, thres, nodeID);
   printf("%is to generate Board\nBoard%i generated\n", (int)(end-start), nodeID);
   
-  /*do not play game of life
+  /* play game of life*/
   if (nNodes == 1) {
     for (int i=0; i<t; i++) {
       if (disp) display_table(board, N, N);
@@ -261,10 +296,7 @@ int main (int argc, char *argv[]) {
       MPI_Barrier(my_world);
       time(&start);
       if (disp) {
-        transfer_board(board, N, wholeboard);
-        if (nodeID==0) {
-          printf("\nGeneration %i\n", i);
-          display_table(wholeboard, 2*N, nNodes*N/2);
+          display_table2(wholeboard, 2*N, nNodes*N/2);
         }
       }
       transfer_boundaries(board, N, boundaries);
@@ -273,16 +305,7 @@ int main (int argc, char *argv[]) {
       printf("\nNode%i\n%is to play round\n", nodeID, (int)(end-start));
     }
   }
-  */
-  /*no finish board
   
-  transfer_board(board, N, wholeboard);
-  
-  if (disp && nodeID==0) {
-    printf("Finish Board:\n");
-    //display_table(wholeboard, 2*N, nNodes*N/2);
-  }
-  */
   /*Free mallocs*/
   if (nNodes>1) free(boundaries);
   free(board);

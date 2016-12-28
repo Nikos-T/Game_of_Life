@@ -37,6 +37,6 @@ void glider(int *board, int N, int nodeID);
 void boundar(int *board, int N, int nodeID);
 /* display the table with delay and clear console */
 
-void display_table(int *board, int N, int M);
+void display_table(int *board, int N);
 
 /* #endif // FOO_H_ */

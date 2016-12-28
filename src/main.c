@@ -149,14 +149,14 @@ void transfer_boundaries(int *board, int N, int *boundaries) {
 void display_table2(int *board, int N) {
   for (int j=0; j<N; j++) {
     MPI_Barrier(my_world);
-    usleep(10000);
+    usleep(20000);
     if (nodeID==0) {
       for (int i=0; i<N; i++) {
         printf ("%c", Board(i,j) ? 'x' : ' ');
       }
     }
     MPI_Barrier(my_world);
-    usleep(10000);
+    usleep(20000);
     if (nodeID==1) {
       for (int i=0; i<N; i++) {
         printf ("%c", Board(i,j) ? 'x' : ' ');
@@ -170,14 +170,14 @@ void display_table2(int *board, int N) {
   
   for (int j=0; j<N; j++) {
     MPI_Barrier(my_world);
-    usleep(10000);
+    usleep(20000);
     if (nodeID==2) {
       for (int i=0; i<N; i++) {
         printf ("%c", Board(i,j) ? 'x' : ' ');
       }
     }
     MPI_Barrier(my_world);
-    usleep(10000);
+    usleep(20000);
     if (nodeID==3) {
       for (int i=0; i<N; i++) {
         printf ("%c", Board(i,j) ? 'x' : ' ');

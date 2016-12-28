@@ -249,7 +249,7 @@ int main (int argc, char *argv[]) {
   
   /*Define board and wholeboard*/
   board = (int *)malloc(N*N*sizeof(int));
-  if ((wholeboard == NULL) && (nNodes >1)) {
+  if (board == NULL) {
     printf("\nERROR: Memory allocation did not complete successfully!\n");
     return (1);
   }
@@ -288,8 +288,7 @@ int main (int argc, char *argv[]) {
       MPI_Barrier(my_world);
       time(&start);
       if (disp) {
-          display_table2(board, N);
-        }
+        display_table2(board, N);
       }
       transfer_boundaries(board, N, boundaries);
       play2(board, newboard, N, boundaries, 4);
@@ -302,7 +301,6 @@ int main (int argc, char *argv[]) {
   if (nNodes>1) free(boundaries);
   free(board);
   free(newboard);
-  if (nodeID==0 && nNodes==4) free(wholeboard);
   
   MPI_Finalize();
   return (0);

@@ -187,7 +187,7 @@ void display_table2(int *board, int N) {
 }
 
 int main (int argc, char *argv[]) {
-  int   *board, *newboard, *wholeboard;
+  int   *board, *newboard;
   time(&start);
   if (argc != 6) { // Check if the command line arguments are correct 
     printf( "Usage: %s N thres disp\n"
@@ -236,7 +236,7 @@ int main (int argc, char *argv[]) {
 
   // Input command line arguments
   int N = atoi(argv[1]);        // Array size
-  if (N%8!=0) N+=8-N%8;  // for encode-decode
+  if (N%8!=0) N+=8-N%8;         // for encode-decode
   double thres = atof(argv[2]); // Propability of life cell
   int t = atoi(argv[3]);        // Number of generations 
   int disp = atoi(argv[4]);     // Display output?
@@ -249,17 +249,9 @@ int main (int argc, char *argv[]) {
   
   /*Define board and wholeboard*/
   board = (int *)malloc(N*N*sizeof(int));
-  if (nodeID == 0) {
-    if (nNodes==2) {  //in this case board doesn't need to be redefined
-      board = (int *) realloc(board, 2*N*N*sizeof(int));
-      wholeboard = board;
-    } else if (nNodes==4) { //here column size changes so we need the variable wholeboard
-      wholeboard = (int *)malloc(4*N*N*sizeof(int));
-      if ((wholeboard == NULL) && (nNodes >1)) {
-        printf("\nERROR: Memory allocation did not complete successfully!\n");
-        return (1);
-      }
-    }
+  if ((wholeboard == NULL) && (nNodes >1)) {
+    printf("\nERROR: Memory allocation did not complete successfully!\n");
+    return (1);
   }
   
   /*Define boundaries*/
@@ -288,7 +280,7 @@ int main (int argc, char *argv[]) {
   /* play game of life*/
   if (nNodes == 1) {
     for (int i=0; i<t; i++) {
-      if (disp) display_table(board, N, N);
+      if (disp) display_table(board, N);
       play(board, newboard, N);
     }
   } else {
@@ -296,7 +288,7 @@ int main (int argc, char *argv[]) {
       MPI_Barrier(my_world);
       time(&start);
       if (disp) {
-          display_table2(wholeboard, 2*N, nNodes*N/2);
+          display_table2(board, N);
         }
       }
       transfer_boundaries(board, N, boundaries);

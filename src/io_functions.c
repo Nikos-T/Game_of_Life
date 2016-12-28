@@ -7,11 +7,11 @@
 
 /* print the life board */
 
-void print (int *board, int N, int M) {
+void print(int *board, int N) {
   int   i, j;
 
   /* for each row */
-  for (j=0; j<M; j++) {
+  for (j=0; j<N; j++) {
 
     /* print each column position... */
     for (i=0; i<N; i++) {
@@ -27,8 +27,8 @@ void print (int *board, int N, int M) {
 
 /* display the table with delay and clear console */
 
-void display_table(int *board, int N, int M) {
-  print (board, N, M);
+void display_table(int *board, int N) {
+  print(board, N);
   usleep(100000);  
   /* clear the screen using VT100 escape codes */
   /*debug

@@ -12,7 +12,6 @@
 
 #include <game-of-life.h>
 
-#include <string.h>   //memcpy
 #include <mpi.h>
 #include <omp.h>
 
@@ -41,99 +40,6 @@ void decode( unsigned char coded8, int * cells) {
   for (int i=0; i<8; i++) {
     cells[i] = coded8 & 0x01;
     coded8 = coded8>>1;
-  }
-}
-
-void transfer_board(int *board, int N, int *wholeboard) {
-  if (nNodes == 2) {
-    unsigned char coded_board1[N*N/8];
-    if (nodeID == 0) {
-      MPI_Recv(coded_board1, N*N/8, MPI_UNSIGNED_CHAR, 1, 1, my_world, &status);
-      //decode:
-      #pragma omp parallel for
-      for (int i=0; i<N*N/8; i++) {
-        decode(coded_board1[i], &board[N*N+i*8]);
-      }
-    } else {
-      //encode:
-      #pragma omp parallel for
-      for (int i=0; i<N*N/8; i++) {
-        coded_board1[i] = encode(&board[i*8]);
-      }
-      MPI_Send(coded_board1, N*N/8, MPI_UNSIGNED_CHAR, 0, 1, my_world);
-    }
-  } else if (nNodes ==4) {
-    if (nodeID == 0) {
-      
-      unsigned char *coded_columns;
-      coded_columns = (unsigned char *)malloc(3*N*N/8*sizeof(unsigned char));
-      printf("coded_columns initialized\n");
-      if (coded_columns == NULL) {
-        printf("coded_columns0 allocation failed\n");
-        MPI_Finalize();
-        exit(1);
-      }
-      #pragma omp parallel for
-      for (int i=0; i<N; i++) {
-        memcpy(&wholeboard[2*N*i], &board[N*i], N*sizeof(int)); //copy board0 to wholeboard
-      }
-      //receive:
-      
-      #pragma omp parallel sections
-      {
-        #pragma omp section
-        {
-          for (int i=0; i<N; i++) {
-            MPI_Recv(&coded_columns[(N+2*i)*N/8], N/8, MPI_UNSIGNED_CHAR, 1, i, my_world, &status);    //2*N^2/8+2*i*N/8
-          }
-        }
-        #pragma omp section
-        {
-          for (int i=0; i<N; i++) {
-            MPI_Recv(&coded_columns[i*N/8], N/8, MPI_UNSIGNED_CHAR, 2, i, my_world, &status);
-          }
-        }
-        #pragma omp section
-        {
-          for (int i=0; i<N; i++) {
-            MPI_Recv(&coded_columns[(N+2*i+1)*N/8], N/8, MPI_UNSIGNED_CHAR, 3, i, my_world, &status);    //2*N^2/8+(2*i+1)*N/8
-          }
-        }
-      }
-      //decode:
-      #pragma omp parallel for
-      for (int i=0; i<N; i++) {
-        for (int j=0; j<N/8; j++) {
-          decode(coded_columns[i*N/8+j], &wholeboard[(2*i+1)*N+8*j]);
-        }
-      }
-      time(&start);
-      #pragma omp parallel for
-      for (int i=N*N/8; i<3*N*N/8; i++) {
-        decode(coded_columns[i], &wholeboard[N*N+8*i]);
-      }
-      time(&end);
-      printf("%i seconds to copy board2,3\n", (int)(end-start));
-    } else {
-      printf("Node%i to initialize\n", nodeID);
-      unsigned char *coded_columns;
-      coded_columns = (unsigned char *)malloc(N*N/8*sizeof(unsigned char));
-      printf("Node%i coded columns initialized\n", nodeID);
-      if (coded_columns==NULL) {
-        printf("Node%i allocation failed", nodeID);
-        MPI_Finalize();
-        exit(1);
-      }
-      //encode:
-      #pragma omp parallel for
-      for (int i=0; i<N*N/8; i++) {
-        coded_columns[i] = encode(&board[8*i]);
-      }
-      //Send
-      for (int i=0; i<N; i++) {
-        MPI_Send(&coded_columns[i*N/8], N/8, MPI_UNSIGNED_CHAR, 0, i, my_world);
-      }
-    }
   }
 }
 
@@ -239,8 +145,55 @@ void transfer_boundaries(int *board, int N, int *boundaries) {
   }
 }
 
+void display_table2(int *board, int N) {
+  for (int j=0; j<N; j++) {
+    MPI_Barrier(my_world);
+    usleep(20000);
+    if (nodeID==0) {
+      for (int i=0; i<N; i++) {
+        printf ("%c", Board(i,j) ? 'x' : ' ');
+      }
+    }
+    MPI_Barrier(my_world);
+    usleep(20000);
+    if (nodeID==1) {
+      for (int i=0; i<N; i++) {
+        printf ("%c", Board(i,j) ? 'x' : ' ');
+      }
+      printf("\n");
+    }
+  }
+  
+  
+  if (nNodes == 2) {
+    if (nodeID == 1) printf("\n======================\n");
+    return;
+  }
+  
+  for (int j=0; j<N; j++) {
+    MPI_Barrier(my_world);
+    usleep(20000);
+    if (nodeID==2) {
+      for (int i=0; i<N; i++) {
+        printf ("%c", Board(i,j) ? 'x' : ' ');
+      }
+    }
+    MPI_Barrier(my_world);
+    usleep(20000);
+    if (nodeID==3) {
+      for (int i=0; i<N; i++) {
+        printf ("%c", Board(i,j) ? 'x' : ' ');
+      }
+      printf("\n");
+    }
+  }
+  if (nodeID==3) {
+    printf("\n========================\n");
+  }
+}
+
 int main (int argc, char *argv[]) {
-  int   *board, *newboard, *wholeboard;
+  int   *board, *newboard;
   time(&start);
   if (argc != 6) { // Check if the command line arguments are correct 
     printf( "Usage: %s N thres disp\n"
@@ -263,12 +216,7 @@ int main (int argc, char *argv[]) {
     MPI_Finalize();
     return(3);
   }
-  /*Procedure to delete all but one task per node
-   * Firstly we create MPI_Comm which splits MPI_COMM_WORLD based on processor name and get an "inside-node" communicator
-   * Secondly we set the number of openMP threads based on the "inside-node" comm size
-   * Thirldly we split MPI_COMM_WORLD based on ranks of the "inside-node" comm and get the node communicator
-   * Fourthly we pass the size and ranks of the node communicator to global vars
-   * Lastly we delete all but one process per node based on the ranks of the "inside-node" comm (first communicator)*/
+  /*Procedure to delete all but one task per node*/
   char *pname = malloc(MPI_MAX_PROCESSOR_NAME*sizeof(char));
   int len, node_key, node_nthreads, threadID, TID;
   MPI_Get_processor_name(pname, &len);
@@ -294,7 +242,7 @@ int main (int argc, char *argv[]) {
 
   // Input command line arguments
   int N = atoi(argv[1]);        // Array size
-  if (N%8!=0) N+=8-N%8;  // for encode-decode
+  if (N%8!=0) N+=8-N%8;         // for encode-decode
   double thres = atof(argv[2]); // Propability of life cell
   int t = atoi(argv[3]);        // Number of generations 
   int disp = atoi(argv[4]);     // Display output?
@@ -307,17 +255,9 @@ int main (int argc, char *argv[]) {
   
   /*Define board and wholeboard*/
   board = (int *)malloc(N*N*sizeof(int));
-  if (nodeID == 0) {
-    if (nNodes==2) {  //in this case board doesn't need to be redefined
-      board = (int *) realloc(board, 2*N*N*sizeof(int));
-      wholeboard = board;
-    } else if (nNodes==4) { //here column size changes so we need the variable wholeboard
-      wholeboard = (int *)malloc(4*N*N*sizeof(int));
-      if ((wholeboard == NULL) && (nNodes >1)) {
-        printf("\nERROR: Memory allocation did not complete successfully!\n");
-        return (1);
-      }
-    }
+  if (board == NULL) {
+    printf("\nERROR: Memory allocation did not complete successfully!\n");
+    return (1);
   }
   
   /*Define boundaries*/
@@ -333,12 +273,11 @@ int main (int argc, char *argv[]) {
     return (1);
   }
   
-  time(&end);
-  printf("\n%is to configure MPI\nReady to initialize board\n", (int)(end-start));
   time(&start);
   initialize_board (board, N);
   time(&end);
   printf("\n%is to initialize Board\nBoard%i initialized\n", (int)(end-start), nodeID);
+  MPI_Barrier(my_world);
   time(&start);
   //generate_table (board, N, thres, nodeID);  //Usually every board is generated in the same second. Simply adding nodeID to time(NULL) makes the boards differ
   if (glid) glider(board, N, nodeID); //for debug purposes
@@ -346,10 +285,10 @@ int main (int argc, char *argv[]) {
   time(&end);
   printf("%is to generate Board\nBoard%i generated\n", (int)(end-start), nodeID);
   
-  /*play game of life*/
+  /* play game of life*/
   if (nNodes == 1) {
     for (int i=0; i<t; i++) {
-      if (disp) display_table(board, N, N);
+      if (disp) display_table(board, N);
       play(board, newboard, N);
     }
   } else {
@@ -357,32 +296,19 @@ int main (int argc, char *argv[]) {
       MPI_Barrier(my_world);
       time(&start);
       if (disp) {
-        transfer_board(board, N, wholeboard);
-        if (nodeID==0) {
-          printf("\nGeneration %i\n", i);
-          display_table(wholeboard, 2*N, nNodes*N/2);
-        }
+        display_table2(board, N);
       }
       transfer_boundaries(board, N, boundaries);
-      play2(board, newboard, N, boundaries, 4);
+      play2(board, newboard, N, boundaries, nNodes);
       time(&end);
       printf("\nNode%i\n%is to play round\n", nodeID, (int)(end-start));
     }
   }
   
-  /*display finish board*/
-  
-  transfer_board(board, N, wholeboard);
-  
-  if (disp && nodeID==0) {
-    printf("Finish Board:\n");
-    //display_table(wholeboard, 2*N, nNodes*N/2);
-  }
   /*Free mallocs*/
   if (nNodes>1) free(boundaries);
   free(board);
   free(newboard);
-  if (nodeID==0 && nNodes==4) free(wholeboard);
   
   MPI_Finalize();
   return (0);

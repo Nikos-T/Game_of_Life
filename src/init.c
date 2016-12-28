@@ -7,6 +7,7 @@
 #include <omp.h>
 /* set everthing to zero */
 
+
 void initialize_board (int *board, int N) {
   
   #pragma omp parallel for collapse(2)
@@ -20,15 +21,26 @@ void initialize_board (int *board, int N) {
 /* generate random table */
 
 void generate_table (int *board, int N, float threshold, int nodeID) {
+  time_t start, end;
   
   srand(time(NULL)*(nodeID+1));
   int thres = threshold*RAND_MAX;
-
+  time(&start);
+  for (int i=0; i<N*N; i++) {
+    board[i]=rand();
+  }
+  time(&end);
+  printf("Node%i:\n%i seconds to populate with rands\n", nodeID, (int)(end-start));
+  time(&start);
+  #pragma omp parallel for collapse(2)
   for (int i=0; i<N; i++) {
     for (int j=0; j<N; j++) {
-      Board(i,j) = rand() < thres;
+      Board(i,j)=Board(i,j)<thres;
     }
   }
+  time(&end);
+  printf("Node%i:\n%i seconds to compare with rands\n", nodeID, (int)(end-start));
+
   /*
   int res[omp_get_num_threads()];
   int thrID;

@@ -299,7 +299,7 @@ int main (int argc, char *argv[]) {
         display_table2(board, N);
       }
       transfer_boundaries(board, N, boundaries);
-      play2(board, newboard, N, boundaries, 4);
+      play2(board, newboard, N, boundaries, nNodes);
       time(&end);
       printf("\nNode%i\n%is to play round\n", nodeID, (int)(end-start));
     }

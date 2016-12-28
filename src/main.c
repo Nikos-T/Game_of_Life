@@ -161,6 +161,7 @@ void display_table2(int *board, int N) {
         printf ("%c", Board(i,j) ? 'x' : ' ');
         //usleep??
       }
+      printf("\n");
     }
   }
   if (nNodes == 2) {
@@ -181,6 +182,7 @@ void display_table2(int *board, int N) {
         printf ("%c", Board(i,j) ? 'x' : ' ');
         //usleep??
       }
+      printf("\n");
     }
   }
   
@@ -286,14 +288,14 @@ int main (int argc, char *argv[]) {
   } else {
     for (int i=0; i<t; i++) {
       MPI_Barrier(my_world);
-      time(&start);
+      //time(&start);
       if (disp) {
         display_table2(board, N);
       }
       transfer_boundaries(board, N, boundaries);
       play2(board, newboard, N, boundaries, 4);
-      time(&end);
-      printf("\nNode%i\n%is to play round\n", nodeID, (int)(end-start));
+      //time(&end);
+      //printf("\nNode%i\n%is to play round\n", nodeID, (int)(end-start));
     }
   }
   

@@ -232,7 +232,7 @@ int main (int argc, char *argv[]) {
     return(0);
   }
   if (nNodes!=1 && nNodes!=2 && nNodes!=4) {  //check nodes=1,2 or 4
-    printf("This many nodes not supported");
+    printf("This many nodes not supported\n");
     MPI_Finalize();
     return(-1);
   }

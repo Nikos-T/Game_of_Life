@@ -15,10 +15,10 @@
 #include <mpi.h>
 #include <omp.h>
 
-MPI_Comm my_world;  //inside-processor communicator
 int nodeID, nNodes;
 MPI_Status status;
 time_t start, end;
+struct timespec tstart={0,0}, tend={0,0};
 
 /*https://www.archer.ac.uk/training/course-material/2015/10/AdvMPI_EPCC/S1-L04-Split-Comms.pdf*/
 int name_to_color(char *processor_name) {
@@ -102,40 +102,40 @@ void transfer_boundaries(int *board, int N, int *boundaries) {
   //send-receive
   switch(nodeID) {  //tag 0 means column, tag 1 means row
     case 0:
-      MPI_Send(coded, N/4, MPI_UNSIGNED_CHAR, 1, 0, my_world);
+      MPI_Send(coded, N/4, MPI_UNSIGNED_CHAR, 1, 0, MPI_COMM_WORLD);
       if (nNodes==4) {
-        MPI_Send(corners, 4, MPI_INT, 3, 0, my_world);
-        MPI_Send(&coded[N/4], N/4, MPI_UNSIGNED_CHAR, 2, 1, my_world);
-        MPI_Recv(&boundaries[4*N], 4, MPI_INT, 3, 0, my_world, &status);
-        MPI_Recv(&coded[N/4], N/4, MPI_UNSIGNED_CHAR, 2, 1, my_world, &status);
+        MPI_Send(corners, 4, MPI_INT, 3, 0, MPI_COMM_WORLD);
+        MPI_Send(&coded[N/4], N/4, MPI_UNSIGNED_CHAR, 2, 1, MPI_COMM_WORLD);
+        MPI_Recv(&boundaries[4*N], 4, MPI_INT, 3, 0, MPI_COMM_WORLD, &status);
+        MPI_Recv(&coded[N/4], N/4, MPI_UNSIGNED_CHAR, 2, 1, MPI_COMM_WORLD, &status);
       }
-      MPI_Recv(coded, N/4, MPI_UNSIGNED_CHAR, 1, 0, my_world, &status);
+      MPI_Recv(coded, N/4, MPI_UNSIGNED_CHAR, 1, 0, MPI_COMM_WORLD, &status);
       break;
     case 1:
-      MPI_Send(coded, N/4, MPI_UNSIGNED_CHAR, 0, 0, my_world);
+      MPI_Send(coded, N/4, MPI_UNSIGNED_CHAR, 0, 0, MPI_COMM_WORLD);
       if (nNodes==4) {
-        MPI_Send(corners, 4, MPI_INT, 2, 0, my_world);
-        MPI_Send(&coded[N/4], N/4, MPI_UNSIGNED_CHAR, 3, 1, my_world);
-        MPI_Recv(&boundaries[4*N], 4, MPI_INT, 2, 0, my_world, &status);
-        MPI_Recv(&coded[N/4], N/4, MPI_UNSIGNED_CHAR, 3, 1, my_world, &status);
+        MPI_Send(corners, 4, MPI_INT, 2, 0, MPI_COMM_WORLD);
+        MPI_Send(&coded[N/4], N/4, MPI_UNSIGNED_CHAR, 3, 1, MPI_COMM_WORLD);
+        MPI_Recv(&boundaries[4*N], 4, MPI_INT, 2, 0, MPI_COMM_WORLD, &status);
+        MPI_Recv(&coded[N/4], N/4, MPI_UNSIGNED_CHAR, 3, 1, MPI_COMM_WORLD, &status);
       }
-      MPI_Recv(coded, N/4, MPI_UNSIGNED_CHAR, 0, 0, my_world, &status);
+      MPI_Recv(coded, N/4, MPI_UNSIGNED_CHAR, 0, 0, MPI_COMM_WORLD, &status);
       break;
     case 2:
-      MPI_Send(coded, N/4, MPI_UNSIGNED_CHAR, 3, 0, my_world);
-      MPI_Send(corners, 4, MPI_INT, 1, 0, my_world);
-      MPI_Send(&coded[N/4], N/4, MPI_UNSIGNED_CHAR, 0, 1, my_world);
-      MPI_Recv(&boundaries[4*N], 4, MPI_INT, 1, 0, my_world, &status);
-      MPI_Recv(coded, N/4, MPI_UNSIGNED_CHAR, 3, 0, my_world, &status);
-      MPI_Recv(&coded[N/4], N/4, MPI_UNSIGNED_CHAR, 0, 1, my_world, &status);
+      MPI_Send(coded, N/4, MPI_UNSIGNED_CHAR, 3, 0, MPI_COMM_WORLD);
+      MPI_Send(corners, 4, MPI_INT, 1, 0, MPI_COMM_WORLD);
+      MPI_Send(&coded[N/4], N/4, MPI_UNSIGNED_CHAR, 0, 1, MPI_COMM_WORLD);
+      MPI_Recv(&boundaries[4*N], 4, MPI_INT, 1, 0, MPI_COMM_WORLD, &status);
+      MPI_Recv(coded, N/4, MPI_UNSIGNED_CHAR, 3, 0, MPI_COMM_WORLD, &status);
+      MPI_Recv(&coded[N/4], N/4, MPI_UNSIGNED_CHAR, 0, 1, MPI_COMM_WORLD, &status);
       break;
     case 3:
-      MPI_Send(coded, N/4, MPI_UNSIGNED_CHAR, 2, 0, my_world);
-      MPI_Send(corners, 4, MPI_INT, 0, 0, my_world);
-      MPI_Send(&coded[N/4], N/4, MPI_UNSIGNED_CHAR, 1, 1, my_world);
-      MPI_Recv(&boundaries[4*N], 4, MPI_INT, 0, 0, my_world, &status);
-      MPI_Recv(coded, N/4, MPI_UNSIGNED_CHAR, 2, 0, my_world, &status);
-      MPI_Recv(&coded[N/4], N/4, MPI_UNSIGNED_CHAR, 1, 1, my_world, &status);
+      MPI_Send(coded, N/4, MPI_UNSIGNED_CHAR, 2, 0, MPI_COMM_WORLD);
+      MPI_Send(corners, 4, MPI_INT, 0, 0, MPI_COMM_WORLD);
+      MPI_Send(&coded[N/4], N/4, MPI_UNSIGNED_CHAR, 1, 1, MPI_COMM_WORLD);
+      MPI_Recv(&boundaries[4*N], 4, MPI_INT, 0, 0, MPI_COMM_WORLD, &status);
+      MPI_Recv(coded, N/4, MPI_UNSIGNED_CHAR, 2, 0, MPI_COMM_WORLD, &status);
+      MPI_Recv(&coded[N/4], N/4, MPI_UNSIGNED_CHAR, 1, 1, MPI_COMM_WORLD, &status);
       break;
   }
   //decode:
@@ -147,14 +147,14 @@ void transfer_boundaries(int *board, int N, int *boundaries) {
 
 void display_table2(int *board, int N) {
   for (int j=0; j<N; j++) {
-    MPI_Barrier(my_world);
+    MPI_Barrier(MPI_COMM_WORLD);
     usleep(20000);
     if (nodeID==0) {
       for (int i=0; i<N; i++) {
         printf ("%c", Board(i,j) ? 'x' : ' ');
       }
     }
-    MPI_Barrier(my_world);
+    MPI_Barrier(MPI_COMM_WORLD);
     usleep(20000);
     if (nodeID==1) {
       for (int i=0; i<N; i++) {
@@ -169,14 +169,14 @@ void display_table2(int *board, int N) {
   }
   
   for (int j=0; j<N; j++) {
-    MPI_Barrier(my_world);
+    MPI_Barrier(MPI_COMM_WORLD);
     usleep(20000);
     if (nodeID==2) {
       for (int i=0; i<N; i++) {
         printf ("%c", Board(i,j) ? 'x' : ' ');
       }
     }
-    MPI_Barrier(my_world);
+    MPI_Barrier(MPI_COMM_WORLD);
     usleep(20000);
     if (nodeID==3) {
       for (int i=0; i<N; i++) {
@@ -262,12 +262,12 @@ int main (int argc, char *argv[]) {
     return (1);
   }
   
-  time(&start);
+  clock_gettime(CLOCK_MONOTONIC, &tstart);
   initialize_board (board, N);
-  time(&end);
-  printf("\n%is to initialize Board\nBoard%i initialized\n", (int)(end-start), nodeID);
+  clock_gettime(CLOCK_MONOTONIC, &tend);
+  printf("\n%is to initialize Board\nBoard%i initialized\n", (double)(tend.tv_sec+1.0e-9*tend.tv_nsec)-(double)(tstart.tv_sec+1.0e-9*tstart.tv_nsec), nodeID);
   /*
-  MPI_Barrier(my_world);
+  MPI_Barrier(MPI_COMM_WORLD);
   time(&start);
   //generate_table (board, N, thres, nodeID);  //Usually every board is generated in the same second. Simply adding nodeID to time(NULL) makes the boards differ
   if (glid) glider(board, N, nodeID); //for debug purposes
@@ -284,7 +284,7 @@ int main (int argc, char *argv[]) {
     }
   } else {
     for (int i=0; i<t; i++) {
-      MPI_Barrier(my_world);
+      MPI_Barrier(MPI_COMM_WORLD);
       time(&start);
       if (disp) {
         display_table2(board, N);

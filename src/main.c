@@ -222,16 +222,15 @@ int main (int argc, char *argv[]) {
   node_key = name_to_color(pname);  //hash processor name to a unique integer value
   MPI_Comm_split(MPI_COMM_WORLD, node_key, TID, &my_world); //here my_world is "inside-node" communicator
   MPI_Comm_size(my_world, &node_nthreads);
-  printf("%i processors in my node\n", node_nthreads);
   MPI_Comm_rank(my_world, &threadID);
   MPI_Comm_split(MPI_COMM_WORLD, threadID, TID, &my_world); //here my_world is node communicator
   MPI_Comm_size(my_world, &nNodes); //pass size of communicator to global variable
   MPI_Comm_rank(my_world, &nodeID); //pass nodeID to global variable (needed for send-recv)
+  MPI_Barrier(MPI_COMM_WORLD);
   if (threadID!=0) {  //close all but one process per node
     MPI_Finalize();
     return(0);
   }
-  MPI_Barrier(my_world);
   printf("I am thread %i of node: %s.\nI have %i threads under my command.", threadID, pname, node_nthreads);
   if (nNodes!=1 && nNodes!=2 && nNodes!=4) {  //check nodes=1,2 or 4
     printf("nNodes = %i\nThis many nodes not supported\n", nNodes);

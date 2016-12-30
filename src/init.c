@@ -10,11 +10,9 @@
 
 void initialize_board (int *board, int N) {
   
-  #pragma omp parallel for collapse(2)
-  for (int i=0; i<N; i++) {
-    for (int j=0; j<N; j++) {
-      Board(i,j) = 0;
-    }
+  #pragma omp parallel for
+  for (int i=0; i<N*N; i++) {
+    board[i]=0;
   }
 }
 

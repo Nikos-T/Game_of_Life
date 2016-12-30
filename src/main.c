@@ -163,8 +163,6 @@ void display_table2(int *board, int N) {
       printf("\n");
     }
   }
-  
-  
   if (nNodes == 2) {
     if (nodeID == 1) printf("\n======================\n");
     return;
@@ -277,6 +275,7 @@ int main (int argc, char *argv[]) {
   initialize_board (board, N);
   time(&end);
   printf("\n%is to initialize Board\nBoard%i initialized\n", (int)(end-start), nodeID);
+  /*
   MPI_Barrier(my_world);
   time(&start);
   //generate_table (board, N, thres, nodeID);  //Usually every board is generated in the same second. Simply adding nodeID to time(NULL) makes the boards differ
@@ -284,8 +283,9 @@ int main (int argc, char *argv[]) {
   else generate_table (board, N, thres, nodeID);
   time(&end);
   printf("%is to generate Board\nBoard%i generated\n", (int)(end-start), nodeID);
-  
+  */
   /* play game of life*/
+  /*
   if (nNodes == 1) {
     for (int i=0; i<t; i++) {
       if (disp) display_table(board, N);
@@ -304,7 +304,7 @@ int main (int argc, char *argv[]) {
       printf("\nNode%i\n%is to play round\n", nodeID, (int)(end-start));
     }
   }
-  
+  */
   /*Free mallocs*/
   if (nNodes>1) free(boundaries);
   free(board);

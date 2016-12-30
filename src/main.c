@@ -271,9 +271,9 @@ int main (int argc, char *argv[]) {
     return (1);
   }
   
-  start = clock_gettime();
+  time(&start);
   initialize_board (board, N);
-  end = clock_gettime();
+  time(&end);
   printf("\n%is to initialize Board\nBoard%i initialized\n", (int)(end-start), nodeID);
   /*
   MPI_Barrier(my_world);

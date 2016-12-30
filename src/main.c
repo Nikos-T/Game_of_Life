@@ -227,11 +227,14 @@ int main (int argc, char *argv[]) {
   MPI_Comm_size(my_world, &nNodes); //pass size of communicator to global variable
   MPI_Comm_rank(my_world, &nodeID); //pass nodeID to global variable (needed for send-recv)
   MPI_Barrier(MPI_COMM_WORLD);
+  printf("I am thread %i of node: %s.\nI have %i threads under my command.\n\n", threadID, pname, node_nthreads);
+
   if (threadID!=0) {  //close all but one process per node
     MPI_Finalize();
     return(0);
   }
-  printf("I am thread %i of node: %s.\nI have %i threads under my command.", threadID, pname, node_nthreads);
+  
+  MPI_Barrier(MPI_COMM_WORLD);
   if (nNodes!=1 && nNodes!=2 && nNodes!=4) {  //check nodes=1,2 or 4
     printf("nNodes = %i\nThis many nodes not supported\n", nNodes);
     MPI_Finalize();

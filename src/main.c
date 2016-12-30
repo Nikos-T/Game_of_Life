@@ -219,13 +219,13 @@ int main (int argc, char *argv[]) {
   MPI_Comm_rank(MPI_COMM_WORLD, &nodeID);  //TID is task ID from MPI_COMM_WORLD
   MPI_Comm_size(MPI_COMM_WORLD, &nNodes);
   MPI_Get_processor_name(pname, &len);
-  printf("I am node %s.\nMy rank is %i.", pname, nodeID);
+  len = omp_get_num_threads();
+  printf("I am node %s.\nMy rank is %i.\nI have %i threads.", pname, nodeID, len);
   if (nNodes!=1 && nNodes!=2 && nNodes!=4) {  //check nodes=1,2 or 4
     printf("nNodes = %i\nThis many nodes not supported\n", nNodes);
     MPI_Finalize();
     return(-1);
   }
-  omp_set_num_threads(node_nthreads); //set omp threads per node
   }
 
   // Input command line arguments

@@ -217,13 +217,14 @@ int main (int argc, char *argv[]) {
   /*Procedure to delete all but one task per node*/
   char *pname = malloc(MPI_MAX_PROCESSOR_NAME*sizeof(char));
   int len, node_key, node_nthreads, threadID, TID;
+  MPI_Comm_rank(MPI_COMM_WORLD, &TID);  //TID is task ID from MPI_COMM_WORLD
   MPI_Get_processor_name(pname, &len);
   node_key = name_to_color(pname);  //hash processor name to a unique integer value
-  MPI_Comm_split(MPI_COMM_WORLD, node_key, 0, &my_world); //here my_world is "inside-node" communicator
+  MPI_Comm_split(MPI_COMM_WORLD, node_key, TID, &my_world); //here my_world is "inside-node" communicator
   MPI_Comm_size(my_world, &node_nthreads);
+  printf("%i processors in my node\n", node_nthreads);
   omp_set_num_threads(node_nthreads); //set omp threads per node
   MPI_Comm_rank(my_world, &threadID);
-  MPI_Comm_rank(MPI_COMM_WORLD, &TID);  //TID is task ID from MPI_COMM_WORLD
   MPI_Comm_split(MPI_COMM_WORLD, threadID, TID, &my_world); //here my_world is node communicator
   MPI_Comm_size(my_world, &nNodes); //pass size of communicator to global variable
   MPI_Comm_rank(my_world, &nodeID); //pass nodeID to global variable (needed for send-recv)

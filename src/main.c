@@ -214,27 +214,12 @@ int main (int argc, char *argv[]) {
     MPI_Finalize();
     return(3);
   }
-  /*Procedure to delete all but one task per node*/
   char *pname = malloc(MPI_MAX_PROCESSOR_NAME*sizeof(char));
-  int len, node_key, node_nthreads, threadID, TID;
-  MPI_Comm_rank(MPI_COMM_WORLD, &TID);  //TID is task ID from MPI_COMM_WORLD
+  int len;
+  MPI_Comm_rank(MPI_COMM_WORLD, &nodeID);  //TID is task ID from MPI_COMM_WORLD
+  MPI_Comm_size(MPI_COMM_WORLD, &nNodes);
   MPI_Get_processor_name(pname, &len);
-  node_key = name_to_color(pname);  //hash processor name to a unique integer value
-  MPI_Comm_split(MPI_COMM_WORLD, node_key, TID, &my_world); //here my_world is "inside-node" communicator
-  MPI_Comm_size(my_world, &node_nthreads);
-  MPI_Comm_rank(my_world, &threadID);
-  MPI_Comm_split(MPI_COMM_WORLD, threadID, TID, &my_world); //here my_world is node communicator
-  MPI_Comm_size(my_world, &nNodes); //pass size of communicator to global variable
-  MPI_Comm_rank(my_world, &nodeID); //pass nodeID to global variable (needed for send-recv)
-  MPI_Barrier(MPI_COMM_WORLD);
-  printf("I am thread %i of node: %s.\nI have %i threads under my command.\n\n", threadID, pname, node_nthreads);
-
-  if (threadID!=0) {  //close all but one process per node
-    MPI_Finalize();
-    return(0);
-  }
-  
-  MPI_Barrier(MPI_COMM_WORLD);
+  printf("I am node %s.\nMy rank is %i.", pname, nodeID);
   if (nNodes!=1 && nNodes!=2 && nNodes!=4) {  //check nodes=1,2 or 4
     printf("nNodes = %i\nThis many nodes not supported\n", nNodes);
     MPI_Finalize();

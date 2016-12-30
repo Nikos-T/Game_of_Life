@@ -44,7 +44,7 @@ void play (int *board, int *newboard, int N) {
 
 void play2(int *board, int *newboard, int N, int *boundaries, int nNodes) {
   
-  #pragma omp parallel for collapse(2)
+  #pragma omp parallel for
   for (int i=1; i<N-1; i++) {
     for (int j=1; j<N-1; j++) {
       alive_or_dead_center(board, i, j, N, newboard);

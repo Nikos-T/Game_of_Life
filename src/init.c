@@ -5,11 +5,10 @@
 
 #include <game-of-life.h>
 #include <omp.h>
+
+
 /* set everthing to zero */
-
-
 void initialize_board (int *board, int N) {
-  
   #pragma omp parallel for
   for (int i=0; i<N*N; i++) {
     board[i]=0;
@@ -17,7 +16,6 @@ void initialize_board (int *board, int N) {
 }
 
 /* generate random table */
-
 void generate_table (int *board, int N, float threshold, int nodeID) {
   time_t start, end;
   //rand cannot be parallelized inside a node:
@@ -29,11 +27,9 @@ void generate_table (int *board, int N, float threshold, int nodeID) {
   printf("Node%i:\n%i seconds to populate with rands\n", nodeID, (int)(end-start));
   
   time(&start);
-  #pragma omp parallel for collapse(2)
-  for (int i=0; i<N; i++) {
-    for (int j=0; j<N; j++) {
-      Board(i,j)=Board(i,j)<thres;
-    }
+  #pragma omp parallel for
+  for (int i=0; i<N*N; i++) {
+    board[i]=board[i]<thres;
   }
   time(&end);
   printf("Node%i:\n%i seconds to compare with rands\n", nodeID, (int)(end-start));

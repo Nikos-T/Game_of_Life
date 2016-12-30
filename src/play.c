@@ -137,5 +137,5 @@ void play2(int *board, int *newboard, int N, int *boundaries, int nNodes) {
   /* copy the new board back into the old board */
   #pragma omp parallel for
   for (int i=0; i<N*N; i++)
-    board[i]=newboard[i]
+    board[i]=newboard[i];
 }

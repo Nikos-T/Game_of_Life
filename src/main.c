@@ -18,6 +18,10 @@
 int nodeID, nNodes;
 MPI_Status status;
 time_t start, end;
+struct timeval {
+  time_t tv_sec;        /* seconds */
+  suseconds_t tv_usec;  /* microseconds */
+};
 struct timeval tstart, tend;
 
 /*https://www.archer.ac.uk/training/course-material/2015/10/AdvMPI_EPCC/S1-L04-Split-Comms.pdf*/
@@ -265,7 +269,7 @@ int main (int argc, char *argv[]) {
   gettimeofday(&tstart);
   initialize_board (board, N);
   gettimeofday(&tend);
-  printf("\n%ims to initialize Board\nBoard%i initialized\n", 1000*tend.tv_sec+tend.tv_usec-1000*tstart.tv_sec-tstart.tv_usec, nodeID);
+  printf("\n%ims to initialize Board\nBoard%i initialized\n", 1000*(int)tend.tv_sec+(int)tend.tv_usec-1000*(int)tstart.tv_sec-(int)tstart.tv_usec, nodeID);
   /*
   MPI_Barrier(MPI_COMM_WORLD);
   time(&start);

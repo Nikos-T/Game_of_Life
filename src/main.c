@@ -22,6 +22,7 @@ struct timeval {
   time_t tv_sec;        /* seconds */
   suseconds_t tv_usec;  /* microseconds */
 };
+
 struct timeval tstart, tend;
 
 /*https://www.archer.ac.uk/training/course-material/2015/10/AdvMPI_EPCC/S1-L04-Split-Comms.pdf*/

@@ -18,7 +18,7 @@
 int nodeID, nNodes;
 MPI_Status status;
 time_t start, end;
-struct timespec tstart, tend;
+struct timeval tstart, tend;
 
 /*https://www.archer.ac.uk/training/course-material/2015/10/AdvMPI_EPCC/S1-L04-Split-Comms.pdf*/
 int name_to_color(char *processor_name) {
@@ -262,10 +262,10 @@ int main (int argc, char *argv[]) {
     return (1);
   }
   
-  clock_gettime(CLOCK_MONOTONIC_RAW, &tstart);
+  gettimeofday(&tstart);
   initialize_board (board, N);
-  clock_gettime(CLOCK_MONOTONIC_RAW, &tend);
-  printf("\n%.5fs to initialize Board\nBoard%i initialized\n", (double)(tend.tv_sec+1.0e-9*tend.tv_nsec)-(double)(tstart.tv_sec+1.0e-9*tstart.tv_nsec), nodeID);
+  gettimeofday(&tend);
+  printf("\n%ims to initialize Board\nBoard%i initialized\n", 1000*tend.tv_sec+tend.tv_usec-1000*tstart.tv_sec-tstart.tv_usec, nodeID);
   /*
   MPI_Barrier(MPI_COMM_WORLD);
   time(&start);

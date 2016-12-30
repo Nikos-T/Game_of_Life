@@ -265,7 +265,7 @@ int main (int argc, char *argv[]) {
   clock_gettime(CLOCK_MONOTONIC, &tstart);
   initialize_board (board, N);
   clock_gettime(CLOCK_MONOTONIC, &tend);
-  printf("\n%is to initialize Board\nBoard%i initialized\n", (double)(tend.tv_sec+1.0e-9*tend.tv_nsec)-(double)(tstart.tv_sec+1.0e-9*tstart.tv_nsec), nodeID);
+  printf("\n%.5fs to initialize Board\nBoard%i initialized\n", (double)(tend.tv_sec+1.0e-9*tend.tv_nsec)-(double)(tstart.tv_sec+1.0e-9*tstart.tv_nsec), nodeID);
   /*
   MPI_Barrier(MPI_COMM_WORLD);
   time(&start);

@@ -260,14 +260,15 @@ int main (int argc, char *argv[]) {
   } else {
     for (int i=0; i<t; i++) {
       MPI_Barrier(MPI_COMM_WORLD);
-      time(&start);
+      
       if (disp) {
         display_table2(board, N);
       }
+      time(&start);
       transfer_boundaries(board, N, boundaries);
-      play2(&board, &newboard, N, boundaries, nNodes);
       time(&end);
-      printf("\nNode%i\n%is to play round\n", nodeID, (int)(end-start));
+      printf("\nNode%i\n%is to transfer boundaries\n", nodeID, (int)(end-start));
+      play2(&board, &newboard, N, boundaries, nNodes);
     }
   }
   /* display final table */

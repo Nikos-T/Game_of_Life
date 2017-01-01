@@ -255,7 +255,7 @@ int main (int argc, char *argv[]) {
   if (nNodes == 1) {
     for (int i=0; i<t; i++) {
       if (disp) display_table(board, N);
-      play(board, newboard, N);
+      play(&board, &newboard, N);
     }
   } else {
     for (int i=0; i<t; i++) {

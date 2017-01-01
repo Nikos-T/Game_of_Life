@@ -23,8 +23,8 @@ void alive_or_dead_center(int *board, int i, int j, int N, int *newboard) ;
 
 /* play the game through one generation */
 
-void play (int *board, int *newboard, int N);
-void play2 (int **board, int **newboard, int N, int *boundaries, int nNodes);
+void play (int **b, int **nb, int N);
+void play2 (int **b, int **nb, int N, int *boundaries, int nNodes);
 
 /* print the life board */
 

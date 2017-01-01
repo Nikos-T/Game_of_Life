@@ -154,14 +154,14 @@ void display_table2(int *board, int N) {
 int main (int argc, char *argv[]) {
   int   *board, *newboard;
   time(&start);
-  if (argc != 6) { // Check if the command line arguments are correct 
+  if (argc != 6 && argc != 5) { // Check if the command line arguments are correct 
     printf( "Usage: %s N thres disp\n"
             "where\n"
             "  N     : size of table (N x N)\n"
             "  thres : propability of alive cell\n"
             "  t     : number of generations\n"
             "  disp  : {1: display output, 0: hide output}\n"
-            "  glid  : {1: use glider, 0:random}\n"
+            "  glid  : {1: use glider, 0:random} (optional)\n"
            , argv[0]);
     return (1);
   }
@@ -190,9 +190,9 @@ int main (int argc, char *argv[]) {
   double thres = atof(argv[2]); // Propability of life cell
   int t = atoi(argv[3]);        // Number of generations 
   int disp = atoi(argv[4]);     // Display output?
-  int glid = atoi(argv[5]);
+  int glid = 0;                     // gosper glider gun
+  if (argc == 6) glid = atoi(argv[5]);     
   printf("Size %dx%d with propability: %0.1f%%\n", N, N, thres*100);
-  //gosper glider gun
   
   board = NULL;
   newboard = NULL;

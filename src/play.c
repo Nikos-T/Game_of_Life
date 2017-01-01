@@ -6,7 +6,7 @@
 #include <game-of-life.h>
 #include <omp.h>
 
-void play (int *board, int *newboard, int N) {
+void play (int **b, int **nb, int N) {
   /*
     (copied this from some web page, hence the English spellings...)
 
@@ -22,6 +22,8 @@ void play (int *board, int *newboard, int N) {
     be off in the next generation.
   */
   int   i, j, a;
+  int *board = *b;
+  int *newboard = *nb;
 
   /* for each cell, apply the rules of Life */
   
@@ -34,16 +36,15 @@ void play (int *board, int *newboard, int N) {
       if (a > 3) NewBoard(i,j) = 0;
     }
 
-  /* copy the new board back into the old board */
-
-  for (i=0; i<N; i++)
-    for (j=0; j<N; j++) {
-      Board(i,j) = NewBoard(i,j);
-    }
+  /* swap pointers instead */
+  int *temp = *b;
+  *b = *nb;
+  *nb = temp;
 }
 
 void play2(int **b, int **nb, int N, int *boundaries, int nNodes) {
   
+  /* instead of copying newboard to board, simply swap pointers */
   int *board = *b;
   int *newboard = *nb;
   
@@ -136,6 +137,8 @@ void play2(int **b, int **nb, int N, int *boundaries, int nNodes) {
       if (e[3] > 3) NewBoard(N-1,N-1) = 0;
     }
   }
+  
+  
   int *temp = *b;
   *b = *nb;
   *nb = temp;

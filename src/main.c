@@ -25,7 +25,6 @@ unsigned char encode( int * cells) {
 }
 
 void decode( unsigned char coded8, int * cells) {
-  #pragma omp parallel for
   for (int i=0; i<8; i++) {
     cells[i] = coded8 & 0x01;
     coded8 = coded8>>1;
@@ -40,17 +39,8 @@ void transfer_boundaries(int *board, int N, int *boundaries) {
   if (nNodes == 4) {
     #pragma omp parallel for
     for (int i=0; i<N; i++) {
-      #pragma omp parallel sections
-      {
-        #pragma omp section
-        {
-          uncoded[i] = board[i*N];
-        }
-        #pragma omp section
-        {
-          uncoded[N+i] = board[N*(1+i)-1];
-        }
-      }
+      uncoded[i] = board[i*N];
+      uncoded[N+i] = board[N*(1+i)-1];
     }
     corners[0] = Board(N-1,N-1);
     corners[1] = Board(N-1,0);
@@ -60,32 +50,14 @@ void transfer_boundaries(int *board, int N, int *boundaries) {
   //encode:
   #pragma omp parallel for
   for (int i=0; i<N/8; i++) {
-    #pragma omp parallel sections
-    {
-      #pragma omp section
-      {
-        coded[i] = encode(&board[8*i]);
-      }
-      #pragma omp section
-      {
-        coded[N/8+i] = encode(&board[N*(N-1)+8*i]);
-      }
-    }
+    coded[i] = encode(&board[8*i]);
+    coded[N/8+i] = encode(&board[N*(N-1)+8*i]);
   }
   if (nNodes == 4) {
     #pragma omp parallel for
     for (int i=0; i<N/8; i++) {
-      #pragma omp parallel sections
-      {
-        #pragma omp section
-        {
-          coded[N/4+i] = encode(&uncoded[8*i]);
-        }
-        #pragma omp section
-        {
-          coded[3*N/8+i] = encode(&uncoded[N+8*i]);
-        }
-      }
+      coded[N/4+i] = encode(&uncoded[8*i]);
+      coded[3*N/8+i] = encode(&uncoded[N+8*i]);
     }
   }
   //send-receive

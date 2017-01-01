@@ -19,16 +19,6 @@ int nodeID, nNodes;
 MPI_Status status;
 time_t start, end;
 
-/*https://www.archer.ac.uk/training/course-material/2015/10/AdvMPI_EPCC/S1-L04-Split-Comms.pdf*/
-int name_to_color(char *processor_name) {
-  int hash=0, i=0;
-  while((unsigned char)processor_name[i]!=0) {
-    hash+=(unsigned char)processor_name[i];
-    i++;
-  }
-  return hash;
-}
-
 unsigned char encode( int * cells) {
   unsigned char coded8 = (cells[7]<<7) | (cells[6]<<6) | (cells[5]<<5) | (cells[4]<<4) | (cells[3]<<3) | (cells[2]<<2) | (cells[1]<<1) | cells[0];
   return coded8;
@@ -213,14 +203,8 @@ int main (int argc, char *argv[]) {
     MPI_Finalize();
     return(3);
   }
-  char *pname = malloc(MPI_MAX_PROCESSOR_NAME*sizeof(char));
-  int len;
   MPI_Comm_rank(MPI_COMM_WORLD, &nodeID);  //TID is task ID from MPI_COMM_WORLD
   MPI_Comm_size(MPI_COMM_WORLD, &nNodes);
-  MPI_Get_processor_name(pname, &len);
-  #pragma omp parallel
-  len = omp_get_num_threads();
-  printf("I am node %s.\nMy rank is %i.\nI have %i threads.\n", pname, nodeID, len);
   if (nNodes!=1 && nNodes!=2 && nNodes!=4) {  //check nodes=1,2 or 4
     printf("nNodes = %i\nThis many nodes not supported\n", nNodes);
     MPI_Finalize();

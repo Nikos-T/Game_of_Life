@@ -42,7 +42,10 @@ void play (int *board, int *newboard, int N) {
     }
 }
 
-void play2(int *board, int *newboard, int N, int *boundaries, int nNodes) {
+void play2(int **b, int **nb, int N, int *boundaries, int nNodes) {
+  
+  int *board = *b;
+  int *newboard = *nb;
   
   #pragma omp parallel for
   for (int i=1; i<N-1; i++) {
@@ -133,13 +136,13 @@ void play2(int *board, int *newboard, int N, int *boundaries, int nNodes) {
       if (e[3] > 3) NewBoard(N-1,N-1) = 0;
     }
   }
-  int **temp;
+  int *temp = *b;
+  *b = *nb;
+  *nb = temp;
   /* copy the new board back into the old board 
   #pragma omp parallel for
   for (int i=0; i<N*N; i++)
     board[i]=newboard[i];
   */
-  temp = &board;
-  &board = &newboard;
-  &newboard = temp;
+ 
 }

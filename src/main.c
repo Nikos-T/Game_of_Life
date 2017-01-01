@@ -125,10 +125,8 @@ void display_table2(int *board, int N) {
     }
   }
   if (nNodes == 2) {
-    if (nodeID == 1) printf("\n======================\n");
     return;
   }
-  
   for (int j=0; j<N; j++) {
     MPI_Barrier(MPI_COMM_WORLD);
     usleep(20000);
@@ -145,9 +143,6 @@ void display_table2(int *board, int N) {
       }
       printf("\n");
     }
-  }
-  if (nodeID==3) {
-    printf("\n========================\n");
   }
 }
 
@@ -218,29 +213,36 @@ int main (int argc, char *argv[]) {
   }
   
   /* initialize and generate board */
+  time(&start);
   initialize_board (board, N);
+  time(&end);
+  printf("\nNode %i:\n%i seconds to initialize board\n", nodeID, (int)(end-start));
+  time(&start);
   if (glid) glider(board, N, nodeID); //for debug purposes
   else generate_table (board, N, thres, nodeID);
-
+  time(&end);
+  printf("\nNode %i:\n%i seconds to generate board\n", nodeID, (int)(end-start));
 
   /* play game of life*/
   if (nNodes == 1) {
     for (int i=0; i<t; i++) {
+      time(&start);
       if (disp) display_table(board, N);
       play(&board, &newboard, N);
+      time(&end);
+      printf("\n%i seconds to play round\n", (int)(end-start));
     }
   } else {
     for (int i=0; i<t; i++) {
       MPI_Barrier(MPI_COMM_WORLD);
-      
+      time(&start);
       if (disp) {
         display_table2(board, N);
       }
-      time(&start);
       transfer_boundaries(board, N, boundaries);
-      time(&end);
-      printf("\nNode%i\n%is to transfer boundaries\n", nodeID, (int)(end-start));
       play2(&board, &newboard, N, boundaries, nNodes);
+      time(&end);
+      printf("\nNode%i\n%is to play round\n", nodeID, (int)(end-start));
     }
   }
   /* display final table */

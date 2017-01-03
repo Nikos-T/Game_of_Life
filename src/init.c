@@ -21,8 +21,11 @@ void generate_table (int *board, int N, float threshold, int nodeID) {
   srand(time(NULL)+nodeID);
   int thres = threshold*RAND_MAX;
   int N2= N*N;
+  #pragma omp parallel for private(r)
   for (int i=0; i<N2; i++) {
+    #pragma omp critical
     board[i]=rand();
+    board[i] = board[i] < thres;
   }
   
   #pragma omp parallel for

@@ -26,7 +26,7 @@ void play (int **b, int **nb, int N) {
   int *newboard = *nb;
 
   /* for each cell, apply the rules of Life */
-  
+  #pragma omp parallel for collapse(2) private(a)
   for (i=0; i<N; i++)
     for (j=0; j<N; j++) {
       a = adjacent_to (board, i, j, N);

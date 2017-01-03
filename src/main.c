@@ -158,7 +158,7 @@ int main (int argc, char *argv[]) {
             "  thres : propability of alive cell\n"
             "  t     : number of generations\n"
             "  disp  : {1: display output, 0: hide output}\n"
-            "  glid  : {2:random original, 1: use glider, 0:random} (optional)\n"
+            "  glid  : {1: use glider, 0:random} (optional)\n"
            , argv[0]);
     return (1);
   }
@@ -187,7 +187,7 @@ int main (int argc, char *argv[]) {
   double thres = atof(argv[2]); // Propability of life cell
   int t = atoi(argv[3]);        // Number of generations 
   int disp = atoi(argv[4]);     // Display output?
-  int glid = 0;                     // gosper glider gun
+  int glid = 0;                 // gosper glider gun
   if (argc == 6) glid = atoi(argv[5]);     
   printf("Size %dx%d with propability: %0.1f%%\n", N, N, thres*100);
   
@@ -220,8 +220,7 @@ int main (int argc, char *argv[]) {
   time(&end);
   printf("\nNode %i:\n%i seconds to initialize board\n", nodeID, (int)(end-start));
   time(&start);
-  if (glid == 1) glider(board, N, nodeID); //for debug purposes
-  else if (glid == 2) generate_table_original(board, N, thres);
+  if (glid) glider(board, N, nodeID); //for debug purposes
   else generate_table (board, N, thres, nodeID);
   time(&end);
   printf("\nNode %i:\n%i seconds to generate board\n", nodeID, (int)(end-start));

@@ -18,7 +18,7 @@ void initialize_board (int *board, int N) {
 /* generate random table */
 void generate_table (int *board, int N, float threshold, int nodeID) {
   //rand cannot be parallelized inside a node:
-  srand(time(NULL)*(nodeID+1));
+  srand(time(NULL)+nodeID);
   int thres = threshold*RAND_MAX;
   int N2= N*N;
   for (int i=0; i<N2; i++) {
@@ -26,7 +26,7 @@ void generate_table (int *board, int N, float threshold, int nodeID) {
   }
   
   #pragma omp parallel for
-  for (int i=0; i<N*N; i++) {
+  for (int i=0; i<N2; i++) {
     board[i]=board[i]<thres;
   }
 }
@@ -37,11 +37,8 @@ void generate_table_original (int *board, int N, float threshold) {
 
   srand(time(NULL));
 
-  for (i=0; i<N; i++) {
-
-    for (j=0; j<N; j++) {
-      Board(i,j) = ( (float)rand() / (float)RAND_MAX ) < threshold;
-    }
+  for (i=0; i<N*N; i++) {
+    board[i] = ( (float)rand() / (float)RAND_MAX ) < threshold;
   }
 }
 

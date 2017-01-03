@@ -9,7 +9,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <unistd.h>
-
+#include "sys/time.h"
 #include <game-of-life.h>
 
 #include <mpi.h>
@@ -18,6 +18,7 @@
 int nodeID, nNodes;
 MPI_Status status;
 time_t start, end;
+struct timeval tstart, tend;
 
 unsigned char encode( int * cells) {
   unsigned char coded8 = (cells[7]<<7) | (cells[6]<<6) | (cells[5]<<5) | (cells[4]<<4) | (cells[3]<<3) | (cells[2]<<2) | (cells[1]<<1) | cells[0];
@@ -150,7 +151,7 @@ void display_table2(int *board, int N) {
 
 int main (int argc, char *argv[]) {
   int   *board, *newboard;
-  time(&start);
+
   if (argc != 6 && argc != 5) { // Check if the command line arguments are correct 
     printf( "Usage: %s N thres disp\n"
             "where\n"
@@ -227,10 +228,10 @@ int main (int argc, char *argv[]) {
   /* play game of life*/
   if (nNodes == 1) {
     for (int i=0; i<t; i++) {
-      time(&start);
+      gettimeofday (&tstart, NULL); 
       if (disp) display_table(board, N);
       play2(&board, &newboard, N, boundaries, nNodes);
-      time(&end);
+      gettimeofday (&tend, NULL); 
       printf("\n%i seconds to play round\n", (int)(end-start));
     }
   } else {
@@ -253,7 +254,7 @@ int main (int argc, char *argv[]) {
     else display_table(board, N);
   }
   /*Free mallocs*/
-  if (nNodes>1) free(boundaries);
+  free(boundaries);
   free(board);
   free(newboard);
   MPI_Finalize();

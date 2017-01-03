@@ -158,7 +158,7 @@ int main (int argc, char *argv[]) {
             "  thres : propability of alive cell\n"
             "  t     : number of generations\n"
             "  disp  : {1: display output, 0: hide output}\n"
-            "  glid  : {1: use glider, 0:random} (optional)\n"
+            "  glid  : {2:random original, 1: use glider, 0:random} (optional)\n"
            , argv[0]);
     return (1);
   }
@@ -220,7 +220,8 @@ int main (int argc, char *argv[]) {
   time(&end);
   printf("\nNode %i:\n%i seconds to initialize board\n", nodeID, (int)(end-start));
   time(&start);
-  if (glid) glider(board, N, nodeID); //for debug purposes
+  if (glid == 1) glider(board, N, nodeID); //for debug purposes
+  else if (glid == 2) generate_table_original(board, N, thres);
   else generate_table (board, N, thres, nodeID);
   time(&end);
   printf("\nNode %i:\n%i seconds to generate board\n", nodeID, (int)(end-start));

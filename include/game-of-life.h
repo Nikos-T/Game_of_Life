@@ -32,6 +32,7 @@ void print(int *board, int N);
 
 /* generate random table */
 
+void generate_table_original (int *board, int N, float threshold)
 void generate_table (int *board, int N, float threshold, int nodeID);
 void glider(int *board, int N, int nodeID);
 void boundar(int *board, int N, int nodeID);

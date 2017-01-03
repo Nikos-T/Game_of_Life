@@ -28,10 +28,10 @@ void generate_table (int *board, int N, float threshold, int nodeID) {
     board[i] = board[i] < thres;
   }
   
-  #pragma omp parallel for
+  /*#pragma omp parallel for
   for (int i=0; i<N2; i++) {
     board[i]=board[i]<thres;
-  }
+  }*/
 }
 
 void generate_table_original (int *board, int N, float threshold) {

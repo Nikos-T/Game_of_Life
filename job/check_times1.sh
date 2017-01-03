@@ -3,7 +3,7 @@
 
 #PBS -q pdlab
 #PBS -j oe
-#PBS -l nodes=2:ppn=8
+#PBS -l nodes=1:ppn=8
 
 module load mpi/mpich3-x86_64
 cd $PBS_O_WORKDIR

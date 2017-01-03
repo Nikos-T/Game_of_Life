@@ -249,7 +249,9 @@ int main (int argc, char *argv[]) {
   }
   /* display final table */
   if (disp) {
-    display_table2(board, N);
+    printf("\nFinal Table:\n=================\n");
+    if (nNodes>1) display_table2(board, N);
+    else display_table(board, N);
   }
   /*Free mallocs*/
   if (nNodes>1) free(boundaries);

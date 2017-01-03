@@ -231,8 +231,8 @@ int main (int argc, char *argv[]) {
       gettimeofday (&tstart, NULL); 
       if (disp) display_table(board, N);
       play2(&board, &newboard, N, boundaries, nNodes);
-      gettimeofday (&tend, NULL); 
-      printf("\n%i seconds to play round\n", (int)(end-start));
+      gettimeofday (&tend, NULL);
+      printf("\n%f seconds to play round\n", (double)((tend.tv_usec - tstart.tv_usec)/1.0e6 + tend.tv_sec - tstart.tv_sec));
     }
   } else {
     for (int i=0; i<t; i++) {

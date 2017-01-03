@@ -54,11 +54,18 @@ void play2(int **b, int **nb, int N, int *boundaries, int nNodes) {
       alive_or_dead_center(board, i, j, N, newboard);
     }
   }
-  if (nNodes == 2) {
+  if (nNodes < 4) {
     #pragma omp parallel for
     for (int i=0; i<N; i++) {
       boundaries[2*N+i] = Board(i, 0);
       boundaries[3*N+i] = Board(i, N-1);
+    }
+    if (nNodes == 1) {
+      #pragma omp parallel for
+      for (int i=0; i<N; i++) {
+        boundaries[i] = Board(0, i);
+        boundaries[N+i] = Board(N-1, i);
+      }
     }
     //corners:
     boundaries[4*N] = boundaries[2*N-1];

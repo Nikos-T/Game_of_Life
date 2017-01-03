@@ -203,9 +203,8 @@ int main (int argc, char *argv[]) {
   
   /*Define boundaries*/
   int * boundaries;
-  if (nNodes >1) {
-    boundaries = (int *)malloc(4*(N+1)*sizeof(int));
-  }
+  boundaries = (int *)malloc(4*(N+1)*sizeof(int));
+
   
   /* second pointer for updated result */
   newboard = (int *)malloc(N*N*sizeof(int));
@@ -230,7 +229,7 @@ int main (int argc, char *argv[]) {
     for (int i=0; i<t; i++) {
       time(&start);
       if (disp) display_table(board, N);
-      play(&board, &newboard, N);
+      play2(&board, &newboard, N, boundaries, nNodes);
       time(&end);
       printf("\n%i seconds to play round\n", (int)(end-start));
     }

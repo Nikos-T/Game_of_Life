@@ -7,7 +7,6 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <time.h>
 #include <unistd.h>
 #include "sys/time.h"
 #include <game-of-life.h>
@@ -17,7 +16,6 @@
 
 int nodeID, nNodes;
 MPI_Status status;
-time_t start, end;
 struct timeval tstart, tend;
 
 unsigned char encode( int * cells) {
@@ -215,36 +213,36 @@ int main (int argc, char *argv[]) {
   }
   
   /* initialize and generate board */
-  time(&start);
+  gettimeofday(&tstart, NULL); 
   initialize_board (board, N);
-  time(&end);
-  printf("\nNode %i:\n%i seconds to initialize board\n", nodeID, (int)(end-start));
-  time(&start);
+  gettimeofday(&tend, NULL);
+  printf("\nNode %i:\n%f seconds to initialize board\n", nodeID, (double)((tend.tv_usec - tstart.tv_usec)/1.0e6 + tend.tv_sec - tstart.tv_sec));
+  gettimeofday(&tstart, NULL); 
   if (glid) glider(board, N, nodeID); //for debug purposes
   else generate_table (board, N, thres, nodeID);
-  time(&end);
-  printf("\nNode %i:\n%i seconds to generate board\n", nodeID, (int)(end-start));
+  gettimeofday(&tend, NULL);
+  printf("\nNode %i:\n%f seconds to generate board\n", nodeID, (double)((tend.tv_usec - tstart.tv_usec)/1.0e6 + tend.tv_sec - tstart.tv_sec));
 
   /* play game of life*/
   if (nNodes == 1) {
     for (int i=0; i<t; i++) {
-      gettimeofday (&tstart, NULL); 
+      gettimeofday(&tstart, NULL);
       if (disp) display_table(board, N);
       play2(&board, &newboard, N, boundaries, nNodes);
-      gettimeofday (&tend, NULL);
+      gettimeofday(&tend, NULL);
       printf("\n%f seconds to play round\n", (double)((tend.tv_usec - tstart.tv_usec)/1.0e6 + tend.tv_sec - tstart.tv_sec));
     }
   } else {
     for (int i=0; i<t; i++) {
       MPI_Barrier(MPI_COMM_WORLD);
-      time(&start);
+      gettimeofday(&tstart, NULL);
       if (disp) {
         display_table2(board, N);
       }
       transfer_boundaries(board, N, boundaries);
       play2(&board, &newboard, N, boundaries, nNodes);
-      time(&end);
-      printf("\nNode%i\n%is to play round\n", nodeID, (int)(end-start));
+      gettimeofday(&tend, NULL);
+      printf("\nNode%i\n%f seconds to play round\n", nodeID, (double)((tend.tv_usec - tstart.tv_usec)/1.0e6 + tend.tv_sec - tstart.tv_sec));
     }
   }
   /* display final table */

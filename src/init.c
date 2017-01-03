@@ -33,11 +33,11 @@ void generate_table (int *board, int N, float threshold, int nodeID) {
 
 void generate_table_original (int *board, int N, float threshold) {
 
-  int   i, j;
+  int   i, j, N2=N*N;
 
   srand(time(NULL));
 
-  for (i=0; i<N*N; i++) {
+  for (i=0; i<N2; i++) {
     board[i] = ( (float)rand() / (float)RAND_MAX ) < threshold;
   }
 }

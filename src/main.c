@@ -207,7 +207,7 @@ int main (int argc, char *argv[]) {
   
   /* second pointer for updated result */
   newboard = (int *)malloc(N*N*sizeof(int));
-  if ((board == NULL) || ((boundaries == NULL ) && (nNodes > 1)) || (newboard == NULL)){
+  if ((board == NULL) || (boundaries == NULL ) || (newboard == NULL)){
     printf("\nERROR: Memory allocation did not complete successfully!\n");
     return (1);
   }
@@ -216,12 +216,12 @@ int main (int argc, char *argv[]) {
   gettimeofday(&tstart, NULL); 
   initialize_board (board, N);
   gettimeofday(&tend, NULL);
-  printf("\nNode %i:\n%f seconds to initialize board\n", nodeID, (double)((tend.tv_usec - tstart.tv_usec)/1.0e6 + tend.tv_sec - tstart.tv_sec));
+  printf("\n%f seconds to initialize board\n", (double)((tend.tv_usec - tstart.tv_usec)/1.0e6 + tend.tv_sec - tstart.tv_sec));
   gettimeofday(&tstart, NULL); 
-  if (glid) glider(board, N, nodeID); //for debug purposes
-  else generate_table (board, N, thres, nodeID);
+  if (glid) glider(board, N, 0); //for debug purposes
+  else generate_table (board, N, thres, 0);
   gettimeofday(&tend, NULL);
-  printf("\nNode %i:\n%f seconds to generate board\n", nodeID, (double)((tend.tv_usec - tstart.tv_usec)/1.0e6 + tend.tv_sec - tstart.tv_sec));
+  printf("\n%f seconds to generate board\n", (double)((tend.tv_usec - tstart.tv_usec)/1.0e6 + tend.tv_sec - tstart.tv_sec));
 
   /* play game of life*/
   

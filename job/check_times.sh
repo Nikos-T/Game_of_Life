@@ -1,5 +1,5 @@
 #!/bin/bash
-#PBS -N GoL-4Nodes
+#PBS -N GoL-serial
 
 #PBS -q pdlab
 #PBS -j oe

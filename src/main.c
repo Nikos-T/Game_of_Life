@@ -7,9 +7,8 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <time.h>
 #include <unistd.h>
-
+#include "sys/time.h"
 #include <game-of-life.h>
 
 #include <mpi.h>
@@ -17,7 +16,7 @@
 
 int nodeID, nNodes;
 MPI_Status status;
-time_t start, end;
+struct timeval tstart, tend;
 
 unsigned char encode( int * cells) {
   unsigned char coded8 = (cells[7]<<7) | (cells[6]<<6) | (cells[5]<<5) | (cells[4]<<4) | (cells[3]<<3) | (cells[2]<<2) | (cells[1]<<1) | cells[0];
@@ -150,11 +149,11 @@ void display_table2(int *board, int N) {
 
 int main (int argc, char *argv[]) {
   int   *board, *newboard;
-  time(&start);
+
   if (argc != 6 && argc != 5) { // Check if the command line arguments are correct 
     printf( "Usage: %s N thres disp\n"
             "where\n"
-            "  N     : size of table (N x N)\n"
+            "  N     : size of table (N x N) per NODE\n"
             "  thres : propability of alive cell\n"
             "  t     : number of generations\n"
             "  disp  : {1: display output, 0: hide output}\n"
@@ -214,36 +213,36 @@ int main (int argc, char *argv[]) {
   }
   
   /* initialize and generate board */
-  time(&start);
+  gettimeofday(&tstart, NULL); 
   initialize_board (board, N);
-  time(&end);
-  printf("\nNode %i:\n%i seconds to initialize board\n", nodeID, (int)(end-start));
-  time(&start);
+  gettimeofday(&tend, NULL);
+  printf("\nNode %i:\n%f seconds to initialize board\n", nodeID, (double)((tend.tv_usec - tstart.tv_usec)/1.0e6 + tend.tv_sec - tstart.tv_sec));
+  gettimeofday(&tstart, NULL); 
   if (glid) glider(board, N, nodeID); //for debug purposes
   else generate_table (board, N, thres, nodeID);
-  time(&end);
-  printf("\nNode %i:\n%i seconds to generate board\n", nodeID, (int)(end-start));
+  gettimeofday(&tend, NULL);
+  printf("\nNode %i:\n%f seconds to generate board\n", nodeID, (double)((tend.tv_usec - tstart.tv_usec)/1.0e6 + tend.tv_sec - tstart.tv_sec));
 
   /* play game of life*/
   if (nNodes == 1) {
     for (int i=0; i<t; i++) {
-      time(&start);
+      gettimeofday(&tstart, NULL);
       if (disp) display_table(board, N);
       play2(&board, &newboard, N, boundaries, nNodes);
-      time(&end);
-      printf("\n%i seconds to play round\n", (int)(end-start));
+      gettimeofday(&tend, NULL);
+      printf("\n%f seconds to play round\n", (double)((tend.tv_usec - tstart.tv_usec)/1.0e6 + tend.tv_sec - tstart.tv_sec));
     }
   } else {
     for (int i=0; i<t; i++) {
       MPI_Barrier(MPI_COMM_WORLD);
-      time(&start);
+      gettimeofday(&tstart, NULL);
       if (disp) {
         display_table2(board, N);
       }
       transfer_boundaries(board, N, boundaries);
       play2(&board, &newboard, N, boundaries, nNodes);
-      time(&end);
-      printf("\nNode%i\n%is to play round\n", nodeID, (int)(end-start));
+      gettimeofday(&tend, NULL);
+      printf("\nNode%i\n%f seconds to play round\n", nodeID, (double)((tend.tv_usec - tstart.tv_usec)/1.0e6 + tend.tv_sec - tstart.tv_sec));
     }
   }
   /* display final table */
@@ -253,7 +252,7 @@ int main (int argc, char *argv[]) {
     else display_table(board, N);
   }
   /*Free mallocs*/
-  if (nNodes>1) free(boundaries);
+  free(boundaries);
   free(board);
   free(newboard);
   MPI_Finalize();

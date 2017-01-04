@@ -153,7 +153,7 @@ int main (int argc, char *argv[]) {
   if (argc != 6 && argc != 5) { // Check if the command line arguments are correct 
     printf( "Usage: %s N thres disp\n"
             "where\n"
-            "  N     : size of table (N x N)\n"
+            "  N     : size of table (N x N) per NODE\n"
             "  thres : propability of alive cell\n"
             "  t     : number of generations\n"
             "  disp  : {1: display output, 0: hide output}\n"

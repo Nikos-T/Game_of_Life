@@ -11,13 +11,14 @@
 #include "sys/time.h"
 #include <game-of-life.h>
 
-#include <mpi.h>
-#include <omp.h>
-
+//#include <mpi.h>
+//#include <omp.h>
+/*
 int nodeID, nNodes;
 MPI_Status status;
+*/
 struct timeval tstart, tend;
-
+/*
 unsigned char encode( int * cells) {
   unsigned char coded8 = (cells[7]<<7) | (cells[6]<<6) | (cells[5]<<5) | (cells[4]<<4) | (cells[3]<<3) | (cells[2]<<2) | (cells[1]<<1) | cells[0];
   return coded8;
@@ -146,7 +147,7 @@ void display_table2(int *board, int N) {
   }
   usleep(50000);
 }
-
+*/
 int main (int argc, char *argv[]) {
   int   *board, *newboard;
 
@@ -162,7 +163,7 @@ int main (int argc, char *argv[]) {
     return (1);
   }
   
-  /*Initialize MPI*/
+  /*Initialize MPI
   {
   int provided;
   MPI_Init_thread( &argc, &argv, MPI_THREAD_MULTIPLE, &provided);
@@ -179,7 +180,7 @@ int main (int argc, char *argv[]) {
     return(-1);
   }
   }
-
+  */
   // Input command line arguments
   int N = atoi(argv[1]);        // Array size
   if (N%8!=0) N+=8-N%8;         // for encode-decode
@@ -200,10 +201,9 @@ int main (int argc, char *argv[]) {
     return (1);
   }
   
-  /*Define boundaries*/
+  /* Define boundaries */
   int * boundaries;
   boundaries = (int *)malloc(4*(N+1)*sizeof(int));
-
   
   /* second pointer for updated result */
   newboard = (int *)malloc(N*N*sizeof(int));
@@ -224,14 +224,15 @@ int main (int argc, char *argv[]) {
   printf("\nNode %i:\n%f seconds to generate board\n", nodeID, (double)((tend.tv_usec - tstart.tv_usec)/1.0e6 + tend.tv_sec - tstart.tv_sec));
 
   /* play game of life*/
-  if (nNodes == 1) {
+  
     for (int i=0; i<t; i++) {
       gettimeofday(&tstart, NULL);
       if (disp) display_table(board, N);
-      play2(&board, &newboard, N, boundaries, nNodes);
+      play2(&board, &newboard, N, boundaries, 1);
       gettimeofday(&tend, NULL);
       printf("\n%f seconds to play round\n", (double)((tend.tv_usec - tstart.tv_usec)/1.0e6 + tend.tv_sec - tstart.tv_sec));
     }
+  /*  
   } else {
     for (int i=0; i<t; i++) {
       MPI_Barrier(MPI_COMM_WORLD);
@@ -245,11 +246,11 @@ int main (int argc, char *argv[]) {
       printf("\nNode%i\n%f seconds to play round\n", nodeID, (double)((tend.tv_usec - tstart.tv_usec)/1.0e6 + tend.tv_sec - tstart.tv_sec));
     }
   }
+  */
   /* display final table */
   if (disp) {
     printf("\nFinal Table:\n=================\n");
-    if (nNodes>1) display_table2(board, N);
-    else display_table(board, N);
+    display_table(board, N);
   }
   /*Free mallocs*/
   free(boundaries);

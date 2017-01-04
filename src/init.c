@@ -4,12 +4,12 @@
 #include <unistd.h>
 
 #include <game-of-life.h>
-#include <omp.h>
+//#include <omp.h>
 
 
 /* set everthing to zero */
 void initialize_board (int *board, int N) {
-  #pragma omp parallel for
+  //#pragma omp parallel for
   for (int i=0; i<N*N; i++) {
     board[i]=0;
   }
@@ -22,18 +22,19 @@ void generate_table (int *board, int N, float threshold, int nodeID) {
   int thres = (int)threshold*RAND_MAX;
   int N2= N*N;
   for (int i=0; i<N2; i++) {
-    board[i]=rand();
+    board[i]=rand() <thres;
   }
-  
+  /*
   #pragma omp parallel for
   for (int i=0; i<N2; i++) {
     board[i] = board[i] < thres;
   }
+  */
 }
 
 /*this function serves to test function transfer_boundaries*/
 void boundar(int *board, int N, int nodeID) {
-  #pragma omp parallel for
+  //#pragma omp parallel for
   for (int i=0; i<N; i+=nodeID+1) {
     Board(0, i)=1;
     Board(i, 0)=1;

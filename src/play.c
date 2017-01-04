@@ -4,7 +4,7 @@
 #include <unistd.h>
 
 #include <game-of-life.h>
-#include <omp.h>
+//#include <omp.h>
 
 void play (int **b, int **nb, int N) {
   /*
@@ -26,7 +26,7 @@ void play (int **b, int **nb, int N) {
   int *newboard = *nb;
 
   /* for each cell, apply the rules of Life */
-  #pragma omp parallel for collapse(2) private(a)
+  //#pragma omp parallel for collapse(2) private(a)
   for (i=0; i<N; i++)
     for (j=0; j<N; j++) {
       a = adjacent_to (board, i, j, N);
@@ -48,34 +48,34 @@ void play2(int **b, int **nb, int N, int *boundaries, int nNodes) {
   int *board = *b;
   int *newboard = *nb;
   
-  #pragma omp parallel for
+  //#pragma omp parallel for
   for (int i=1; i<N-1; i++) {
     for (int j=1; j<N-1; j++) {
       alive_or_dead_center(board, i, j, N, newboard);
     }
   }
-  if (nNodes < 4) {
-    #pragma omp parallel for
+ // if (nNodes < 4) {
+    //#pragma omp parallel for
     for (int i=0; i<N; i++) {
       boundaries[2*N+i] = Board(i, 0);
       boundaries[3*N+i] = Board(i, N-1);
     }
-    if (nNodes == 1) {
-      #pragma omp parallel for
+//    if (nNodes == 1) {
+      //#pragma omp parallel for
       for (int i=0; i<N; i++) {
         boundaries[i] = Board(0, i);
         boundaries[N+i] = Board(N-1, i);
       }
-    }
+//    }
     //corners:
     boundaries[4*N] = boundaries[2*N-1];
     boundaries[4*N+1] = boundaries[N];
     boundaries[4*N+2] = boundaries[N-1];
     boundaries[4*N+3] = boundaries[0];
-  }
+ // }
   
   int a;
-  #pragma omp parallel for private(a)
+  //#pragma omp parallel for private(a)
   for (int i=1; i<N-1; i++) {
     //j=0
     a=boundaries[3*N+i-1]+boundaries[3*N+i]+boundaries[3*N+i+1]+Board(i-1,0)+Board(i+1, 0)+Board(i-1,1)+Board(i,1)+Board(i+1,1); 
@@ -106,9 +106,9 @@ void play2(int **b, int **nb, int N, int *boundaries, int nNodes) {
   //corners:
   //(0,0):
   int e[4];
-  #pragma omp parallel sections
+  //#pragma omp parallel sections
   {
-    #pragma omp section
+    //#pragma omp section
     {
       e[0] = boundaries[N]+boundaries[N+1]+boundaries[3*N]+boundaries[3*N+1]+boundaries[4*N]+Board(0,1)+Board(1,0)+Board(1,1);
       if (e[0] == 2) NewBoard(0,0) = Board(0,0);
@@ -117,7 +117,7 @@ void play2(int **b, int **nb, int N, int *boundaries, int nNodes) {
       if (e[0] > 3) NewBoard(0,0) = 0;
     }
   //(0, N-1):
-    #pragma omp section
+    //#pragma omp section
     {
       e[1] = boundaries[3*N]+boundaries[3*N+1]+boundaries[2*N-1]+boundaries[2*N-2]+boundaries[4*N+1]+Board(0, N-2)+Board(1, N-2)+Board(1, N-1);
       if (e[1] == 2) NewBoard(0,N-1) = Board(0,N-1);
@@ -126,7 +126,7 @@ void play2(int **b, int **nb, int N, int *boundaries, int nNodes) {
       if (e[1] > 3) NewBoard(0,N-1) = 0;
     }
   //(N-1, 0):
-    #pragma omp section
+    //#pragma omp section
     {
       e[2] = boundaries[0]+boundaries[1]+boundaries[4*N-1]+boundaries[4*N-2]+boundaries[4*N+2]+Board(N-2, 0)+Board(N-2, 1)+Board(N-1, 1);
       if (e[2] == 2) NewBoard(N-1,0) = Board(N-1,0);
@@ -135,7 +135,7 @@ void play2(int **b, int **nb, int N, int *boundaries, int nNodes) {
       if (e[2] > 3) NewBoard(N-1,0) = 0;
     }
   //(N-1, N-1):
-    #pragma omp section
+    //#pragma omp section
     {
       e[3] = boundaries[N-1]+boundaries[N-2]+boundaries[3*N-1]+boundaries[3*N-2]+boundaries[4*N+3]+Board(N-1, N-2)+Board(N-2, N-1)+Board(N-2,N-2);
       if (e[3] == 2) NewBoard(N-1,N-1) = Board(N-1,N-1);

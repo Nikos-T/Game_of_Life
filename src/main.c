@@ -256,6 +256,6 @@ int main (int argc, char *argv[]) {
   free(boundaries);
   free(board);
   free(newboard);
-  MPI_Finalize();
+  //MPI_Finalize();
   return (0);
 }
